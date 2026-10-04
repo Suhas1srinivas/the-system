@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LIFE OS // THE SYSTEM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="system-theme">
+  <!-- The Silent Sovereign Background Wallpaper Engine -->
+  <div class="sovereign-bg-container" aria-hidden="true">
+    <iframe src="./silent-sovereign-wallpaper-1920x1080.html" class="sovereign-bg-iframe" tabindex="-1"></iframe>
+    <div class="sovereign-bg-overlay"></div>
+  </div>
+
+  <!-- Subtle Ambient Grid FX -->
+  <div class="hud-overlay-grid"></div>
+  <div class="hud-ambient-glow"></div>
+
+  <!-- Main App Layout with Left-Hand Sidebar -->
+  <div class="app-layout">
+
+    <!-- ============================================ -->
+    <!-- LEFT-HAND SIDEBAR NAVIGATION -->
+    <!-- ============================================ -->
+    <aside class="sidebar-nav">
+      
+      <!-- Brand & Date -->
+      <div class="sidebar-brand">
+        <h1 class="brand-title">THE SYSTEM</h1>
+        <div class="sidebar-date-display" id="sidebar-live-date">
+          <span class="date-bullet"></span>
+          <span class="date-text" id="live-date-str">Loading date...</span>
+        </div>
+      </div>
+
+      <!-- Player Profile Card in Sidebar -->
+      <div class="sidebar-player-card">
+        <div class="sidebar-avatar-wrap">
+          <img src="./assets/avatar.jpg" alt="Player Avatar" class="sidebar-avatar-img" />
+          <div class="sidebar-rank-tag" id="sidebar-rank-text">Rank E</div>
+        </div>
+        <div class="sidebar-player-info">
+          <div class="player-name" id="sidebar-player-name">SUHAS S</div>
+          <div class="player-level-tag">LEVEL <span id="sidebar-player-level" class="neon-cyan">1</span></div>
+          <div class="player-sub-title" id="sidebar-player-title">Rank E</div>
+        </div>
+      </div>
+
+      <!-- Navigation Menu Items -->
+      <nav class="sidebar-menu">
+        <button class="nav-item active" data-tab="rules">
+          <span class="nav-label">Menu</span>
+        </button>
+        <button class="nav-item" data-tab="dashboard">
+          <span class="nav-label">Stats Report</span>
+        </button>
+        <button class="nav-item" data-tab="hunter">
+          <span class="nav-label">Daily Routine</span>
+        </button>
+        <button class="nav-item" data-tab="forge">
+          <span class="nav-label">Fitness & Body</span>
+        </button>
+        <button class="nav-item" data-tab="aura">
+          <span class="nav-label">Character & Mindset</span>
+        </button>
+        <button class="nav-item" data-tab="apex">
+          <span class="nav-label">Career Engine</span>
+        </button>
+        <button class="nav-item" data-tab="purity">
+          <span class="nav-label">Purity & Control</span>
+        </button>
+        <button class="nav-item" data-tab="engine">
+          <span class="nav-label">Smoke-Free</span>
+        </button>
+        <button class="nav-item" data-tab="diary">
+          <span class="nav-label">Daily Diary</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer Controls -->
+      <div class="sidebar-footer">
+        <button class="emergency-btn pulse-crimson" id="btn-emergency-protocol" title="Urge / Panic Trigger">
+          
+          <span class="btn-text">CODE RED</span>
+        </button>
+
+        <div class="sidebar-mini-controls">
+          <button class="hud-btn-icon" id="btn-audio-toggle" title="Toggle System Audio">
+            <span id="audio-icon" class="font-hud font-bold">SND: ON</span>
+          </button>
+          <div class="sidebar-midnight-box" title="Time until daily reset">
+            <span class="sm-label">RESET:</span>
+            <span class="sm-timer" id="sidebar-midnight-timer">00:00:00</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT VIEWPORT (RIGHT SIDE) -->
+    <!-- ============================================ -->
+    <div class="main-wrapper">
+      
+      <!-- Top Action Bar -->
+      <header class="top-action-bar">
+        <div class="top-bar-main-row">
+          <!-- Date & Reset Countdown -->
+          <div class="top-left-cluster">
+            <span class="top-date-text" id="header-full-date">Sunday, October 4, 2026</span>
+            <div class="top-reset-badge" title="Daily midnight reset timer">
+              <span class="trb-label">RESET:</span>
+              <span class="trb-timer neon-cyan font-mono" id="hud-midnight-timer">00:00:00</span>
+            </div>
+          </div>
+
+          <!-- Player Identity & Rank -->
+          <div class="top-player-pill">
+            <span class="top-player-name font-hud" id="hud-player-name">Suhas S</span>
+            <span class="top-player-rank font-mono" id="hud-player-rank">Rank E</span>
+          </div>
+
+          <!-- Level & XP Bar -->
+          <div class="top-xp-group">
+            <div class="top-xp-labels">
+              <span>LEVEL <strong id="hud-player-level">1</strong></span>
+              <span id="hud-xp-ratio">0 / 100 XP</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar xp-fill" id="hud-xp-fill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Currency Counters -->
+          <div class="top-currency-group">
+            <div class="curr-pill">
+              <span class="curr-icon font-hud">G</span>
+              <span class="curr-val" id="hud-gold-val">0</span>
+              <span class="curr-label">Gold</span>
+            </div>
+            <div class="curr-pill highlight-green">
+              <span class="curr-icon">₹</span>
+              <span class="curr-val" id="hud-saved-cash">0</span>
+              <span class="curr-label">Saved</span>
+            </div>
+          </div>
+
+          <!-- Quick Write Diary Shortcut -->
+          <button class="action-btn btn-cyan-glow quick-diary-btn" id="btn-quick-diary">
+            Write in Diary
+          </button>
+
+          <!-- Cloud Database Sync Button -->
+          <button class="action-btn btn-cloud-hud" id="btn-open-cloud-sync" title="Multi-Device Cloud Sync (Supabase / Firebase)">
+            <span class="cloud-status-dot dot-offline" id="hud-cloud-dot"></span>
+            <span class="cloud-status-label" id="hud-cloud-label">Cloud Sync</span>
+          </button>
+        </div>
+
+        <!-- Timeline & Campaign Status Box -->
+        <div class="top-timeline-box glass-panel">
+          <div class="ttb-item">
+            <span class="ttb-label">Timeline:</span>
+            <span class="ttb-val neon-cyan font-mono" id="hud-timeline-window">Oct 5 ➔ <span id="hud-timeline-end">Apr 1, 2027</span></span>
+          </div>
+          <span class="ttb-sep">•</span>
+          <div class="ttb-item">
+            <span class="ttb-label">Discipline:</span>
+            <span class="ttb-val neon-gold font-mono" id="hud-discipline-days">178 Days</span>
+          </div>
+          <span class="ttb-sep">•</span>
+          <div class="ttb-item">
+            <span class="ttb-label">Frozen:</span>
+            <span class="ttb-val neon-purple font-mono" id="hud-frozen-days">0 Days</span>
+          </div>
+          <span class="ttb-sep">•</span>
+          <div class="ttb-item">
+            <span class="ttb-label">Extension:</span>
+            <span class="ttb-val neon-green font-mono" id="hud-extension-days">+0 Days</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Viewport -->
+      <main class="content-viewport">
+        <!-- Global Stasis / Freeze Banner (Active when today is frozen) -->
+        <div class="global-stasis-banner" id="global-stasis-banner" style="display: none;">
+          <div class="stasis-banner-left">
+            <span class="stasis-badge font-hud">STASIS ACTIVE</span>
+            <span class="stasis-text">Today is frozen under authorized stasis (Reason: <strong id="stasis-banner-reason"></strong>). Streaks are locked and protected from penalty. Campaign deadline extended by +1 day.</span>
+          </div>
+          <button class="btn-xs btn-outline" id="btn-unfreeze-today">Unfreeze Today</button>
+        </div>
+
+
+        <!-- ============================================ -->
+        <!-- TAB 0: GAME RULES & SYSTEM PROTOCOL -->
+        <!-- ============================================ -->
+        
+        <!-- ============================================ -->
+        <!-- TAB 0: SOVEREIGN MENU // THE AURA BUILD -->
+        <!-- ============================================ -->
+        <section id="tab-rules" class="tab-panel active">
+          
+          <!-- Welcome Hero Header -->
+          <div class="aura-hero-card glass-panel">
+            <div class="aura-hero-top">
+              <div>
+                <span class="panel-tag">WELCOME TO THE SYSTEM</span>
+                <h2 class="aura-main-title">WELCOME, SUHAS S</h2>
+                <p class="aura-tagline">
+                  "The weak chase cheap dopamine. The Sovereign builds an empire."
+                </p>
+              </div>
+              <div class="campaign-countdown-box">
+                <span class="cc-label">CAMPAIGN TIMELINE</span>
+                <span class="cc-dates neon-cyan">OCT 5, 2026 ➔ APR 1, 2027</span>
+                <div class="cc-badge"><span class="neon-gold font-mono" id="menu-discipline-badge">178 DAYS</span> OF DISCIPLINE</div>
+              </div>
+            </div>
+
+            <!-- Mandatory Daily Check-In Warning Card -->
+            <div class="menu-warning-card">
+              <div class="mwc-badge">WARNING // CRITICAL PROTOCOL</div>
+              <h3 class="mwc-title">MANDATORY DAILY CHECK-IN</h3>
+              <p class="mwc-text">You must log in every day and update your tasks before midnight. Failure to report breaks your streak and discipline records. Hold yourself to the highest standard.</p>
+            </div>
+
+            <!-- Instant 1-Click Freeze Today Command Console -->
+            <div class="aura-freeze-console">
+              <div class="afc-status-col">
+                <div class="campaign-status-pill" id="menu-campaign-status-pill">
+                  <span class="status-indicator">●</span> PRE-DEPLOYMENT: STARTS OCT 5, 2026
+                </div>
+                <div class="afc-metrics">
+                  <span class="afc-m-item">Timeline: <strong class="neon-cyan" id="cal-window-display">Oct 5 ➔ <span id="cal-target-end-date">Apr 1, 2027</span></strong></span>
+                  <span class="afc-m-sep">•</span>
+                  <span class="afc-m-item">Discipline: <strong class="neon-gold" id="cal-discipline-count">178 Days</strong></span>
+                  <span class="afc-m-sep">•</span>
+                  <span class="afc-m-item">Frozen: <strong class="neon-purple" id="cal-frozen-count">0 Days</strong></span>
+                  <span class="afc-m-sep">•</span>
+                  <span class="afc-m-item">Extension: <strong class="neon-green" id="cal-extension-count">+0 Days</strong></span>
+                </div>
+              </div>
+              <div class="afc-action-col">
+                <button class="btn-instant-freeze" id="btn-toggle-freeze" title="Freeze Today (Stasis Mode)">
+                  Freeze Today
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: The Evolution Ranks (Alphabet Names Only) -->
+          <div class="rules-section-title-wrap">
+            <h3 class="rules-section-title">THE EVOLUTION RANKS</h3>
+            <span class="rules-section-sub">100 levels of ascension synchronized with real calendar milestones</span>
+          </div>
+
+          <div class="aura-ranks-grid">
+            <!-- Rank E -->
+            <div class="aura-rank-card rank-e glass-panel">
+              <div class="arc-header">
+                <span class="rc-badge badge-cyan">RANK E</span>
+                <span class="arc-meta font-mono">LVL 1–15 • MONTH 1 (OCT)</span>
+              </div>
+              <h4 class="arc-name">Rank E</h4>
+              <p class="arc-focus">Dopamine detox, 5:00 AM biological reset & 3-minute urge interception.</p>
+            </div>
+
+            <!-- Rank D -->
+            <div class="aura-rank-card rank-d glass-panel">
+              <div class="arc-header">
+                <span class="rc-badge badge-success">RANK D</span>
+                <span class="arc-meta font-mono">LVL 16–30 • MONTH 2 (NOV)</span>
+              </div>
+              <h4 class="arc-name">Rank D</h4>
+              <p class="arc-focus">100% nicotine purge, glute bridges for pelvic tilt & weekly Push/Pull/Legs.</p>
+            </div>
+
+            <!-- Rank C -->
+            <div class="aura-rank-card rank-c glass-panel">
+              <div class="arc-header">
+                <span class="rc-badge badge-purple">RANK C</span>
+                <span class="arc-meta font-mono">LVL 31–50 • MONTH 3 (DEC)</span>
+              </div>
+              <h4 class="arc-name">Rank C</h4>
+              <p class="arc-focus">The Silence Code: speak less, move slow, build Python demand forecasting.</p>
+            </div>
+
+            <!-- Rank B -->
+            <div class="aura-rank-card rank-b glass-panel">
+              <div class="arc-header">
+                <span class="rc-badge badge-amber">RANK B</span>
+                <span class="arc-meta font-mono">LVL 51–70 • MONTH 4 (JAN)</span>
+              </div>
+              <h4 class="arc-name">Rank B</h4>
+              <p class="arc-focus">Executive pitch poise, 120g clean protein & Customer Lifetime Value pipelines.</p>
+            </div>
+
+            <!-- Rank A -->
+            <div class="aura-rank-card rank-a glass-panel">
+              <div class="arc-header">
+                <span class="rc-badge badge-danger">RANK A</span>
+                <span class="arc-meta font-mono">LVL 71–85 • MONTH 5 (FEB)</span>
+              </div>
+              <h4 class="arc-name">Rank A</h4>
+              <p class="arc-focus">Unshakeable stoic composure, zero defensiveness & interview gate clearance.</p>
+            </div>
+
+            <!-- Rank S -->
+            <div class="aura-rank-card rank-apex glass-panel">
+              <div class="arc-header">
+                <span class="rc-badge badge-gold">RANK S</span>
+                <span class="arc-meta font-mono">LVL 86–100 • MONTH 6 (MAR-APR)</span>
+              </div>
+              <h4 class="arc-name">Rank S</h4>
+              <p class="arc-focus">15+ LPA FMCG Offer Letter secured. Divine masculine self-respect. Game Cleared.</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 1: STATS REPORT -->
+        <!-- ============================================ -->
+        <section id="tab-dashboard" class="tab-panel">
+          
+          <!-- Top KPI Stat Metrics Row -->
+          <div class="dashboard-kpi-row">
+            <div class="kpi-card glass-panel">
+              <div class="kpi-details">
+                <span class="kpi-label">Purity Streak</span>
+                <span class="kpi-value neon-cyan" id="dash-kpi-purity">0 Days</span>
+                <span class="kpi-sub" id="dash-kpi-purity-sub">Milestone: Day 3</span>
+              </div>
+            </div>
+
+            <div class="kpi-card glass-panel">
+              <div class="kpi-details">
+                <span class="kpi-label">Smoke-Free Time</span>
+                <span class="kpi-value neon-green" id="dash-kpi-smoke">0h Clean</span>
+                <span class="kpi-sub" id="dash-kpi-smoke-sub">0 Cigs Avoided</span>
+              </div>
+            </div>
+
+            <div class="kpi-card glass-panel">
+              <div class="kpi-details">
+                <span class="kpi-label">Fitness & Body</span>
+                <span class="kpi-value neon-amber" id="dash-kpi-gym">0 Workouts</span>
+                <span class="kpi-sub" id="dash-kpi-gym-sub">Habit Formation</span>
+              </div>
+            </div>
+
+            <div class="kpi-card glass-panel">
+              <div class="kpi-details">
+                <span class="kpi-label">15+ LPA Career Gate</span>
+                <span class="kpi-value neon-gold" id="dash-kpi-career">0% Done</span>
+                <span class="kpi-sub" id="dash-kpi-career-sub">0 Apps • 0 Leaders</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Analytics Grid: Flagship Attribute Radar & Weekly Momentum Trend -->
+          <div class="dashboard-analytics-grid">
+            
+            <!-- Chart 1: 6-Attribute System Radar Chart -->
+            <div class="glass-panel chart-panel">
+              <div class="panel-header">
+                <span class="panel-tag">SOVEREIGN ATTRIBUTES RADAR</span>
+                <span class="panel-id">6-DIMENSIONAL MASTERY</span>
+              </div>
+              
+              <div class="chart-canvas-wrapper radar-wrapper">
+                <canvas id="stats-radar-canvas" width="380" height="250"></canvas>
+              </div>
+
+              <div class="radar-stats-chips">
+                <span class="r-chip">PUR: <strong id="r-stat-pur" class="neon-cyan">10</strong></span>
+                <span class="r-chip">VIT: <strong id="r-stat-vit" class="neon-green">10</strong></span>
+                <span class="r-chip">STR: <strong id="r-stat-str" class="neon-amber">10</strong></span>
+                <span class="r-chip">CHA: <strong id="r-stat-cha" class="neon-cyan">10</strong></span>
+                <span class="r-chip">AURA: <strong id="r-stat-aura" class="neon-purple">10</strong></span>
+                <span class="r-chip">INT: <strong id="r-stat-int" class="neon-gold">10</strong></span>
+              </div>
+            </div>
+
+            <!-- Chart 2: 7-Day Consistency & Momentum Trend -->
+            <div class="glass-panel chart-panel">
+              <div class="panel-header">
+                <span class="panel-tag">WEEKLY MOMENTUM & GROWTH</span>
+                <span class="panel-id">7-DAY ACTIVITY TREND</span>
+              </div>
+              
+              <div class="chart-canvas-wrapper">
+                <canvas id="growth-trend-canvas" width="520" height="240"></canvas>
+              </div>
+
+              <div class="chart-summary-footer">
+                <div class="cs-item">
+                  <span class="cs-label">Weekly Consistency:</span>
+                  <span class="cs-val neon-cyan" id="dash-weekly-consistency">85% Active</span>
+                </div>
+                <div class="cs-item">
+                  <span class="cs-label">Momentum Status:</span>
+                  <span class="cs-val neon-green" id="dash-momentum-status">Rising Surge ✦</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section Title: PILLAR-BY-PILLAR PROGRESS GRAPHS -->
+          <div class="dashboard-section-divider">
+            <h3 class="dsd-title">DOMAIN PROGRESS & DETAILED ANALYTICS</h3>
+            <span class="dsd-sub">Real-time charts synchronized directly with each pillar module</span>
+          </div>
+
+          <!-- Section 2: Dedicated Pillar Graphs Grid (6 Detailed Domain Cards) -->
+          <div class="dashboard-pillars-grid">
+
+            <!-- Card 1: Daily Routine & Nutrition Progress (from Daily Routine Page) -->
+            <div class="glass-panel pillar-stat-card">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">DAILY ROUTINE // HUNTER'S FORM</span>
+                  <h4 class="psc-title">Daily Routine & Nutrition Analytics</h4>
+                </div>
+                <span class="badge-cyan" id="dash-routine-score-badge">0% Completed</span>
+              </div>
+
+              <div class="psc-body">
+                <!-- Dawn & Dusk Completion Bars -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Dawn Routine (5:00 AM)</span>
+                    <span class="psc-mb-val neon-cyan" id="dash-dawn-ratio">0 / 4 Done</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill" id="dash-dawn-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Dusk Routine (9:30 PM)</span>
+                    <span class="psc-mb-val neon-purple" id="dash-dusk-ratio">0 / 4 Done</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill purple-fill" id="dash-dusk-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <!-- Protein Target (120g) & Skin Glow Progress -->
+                <div class="psc-dual-row">
+                  <div class="psc-mini-meter">
+                    <div class="pmm-header">
+                      <span>Daily Protein:</span>
+                      <strong class="neon-amber" id="dash-protein-val">0 / 120g</strong>
+                    </div>
+                    <div class="gauge-track">
+                      <div class="gauge-fill amber-fill" id="dash-protein-bar" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div class="psc-mini-meter">
+                    <div class="pmm-header">
+                      <span>Skin Glow:</span>
+                      <strong class="neon-cyan" id="dash-skin-glow-val">0%</strong>
+                    </div>
+                    <div class="gauge-track">
+                      <div class="gauge-fill" id="dash-skin-glow-bar" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Multi-Day Protein Intake vs 120g Target Curve -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Protein Intake vs 120g Benchmark</span>
+                    <span class="psc-mb-val neon-amber">Multi-Day Curve</span>
+                  </div>
+                  <div class="chart-canvas-small-wrap" title="Daily Protein Intake vs 120g Benchmark Line">
+                    <canvas id="dash-protein-history-canvas" width="380" height="140"></canvas>
+                  </div>
+                </div>
+
+                <!-- Anti-Junk Shield Status -->
+                <div class="psc-footer-pill" id="dash-anti-junk-pill">
+                  <span class="f-pill-icon">🛡️</span>
+                  <span class="f-pill-text" id="dash-anti-junk-text">Clean Fuel Shield: Active</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Fitness & Body Progress (from Fitness & Body Page) -->
+            <div class="glass-panel pillar-stat-card">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">FITNESS & BODY // THE IRON FORGE</span>
+                  <h4 class="psc-title">7-Day Split & Strength Analytics</h4>
+                </div>
+                <span class="badge-amber" id="dash-forge-status-badge">REST DAY</span>
+              </div>
+
+              <div class="psc-body">
+                <!-- 7-Day Workout Split Mini Chart -->
+                <div class="workout-split-chart-row" id="dash-split-chart-row">
+                  <!-- Mon to Sun 7 blocks with day name, split, and done indicator -->
+                </div>
+
+                <!-- Multi-Day Workout & Training Volume History Bar Chart -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Workout & Strength Volume History</span>
+                    <span class="psc-mb-val neon-amber">Training Bars</span>
+                  </div>
+                  <div class="chart-canvas-small-wrap" title="Multi-Day Workout & Training Frequency Bar Chart">
+                    <canvas id="dash-workout-history-canvas" width="380" height="140"></canvas>
+                  </div>
+                </div>
+
+                <!-- Strength Sets & Calisthenics Volume -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Strength & Calisthenics Volume</span>
+                    <span class="psc-mb-val neon-amber" id="dash-strength-summary">0 Sets Active</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill amber-fill" id="dash-strength-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <!-- Workouts Done & Streak KPIs -->
+                <div class="psc-kpi-summary-row">
+                  <div class="pks-item">
+                    <span class="pks-val neon-cyan" id="dash-workouts-count">0</span>
+                    <span class="pks-lbl">Workouts Done</span>
+                  </div>
+                  <div class="pks-item">
+                    <span class="pks-val neon-green" id="dash-workouts-streak">0</span>
+                    <span class="pks-lbl">Day Streak</span>
+                  </div>
+                  <div class="pks-item">
+                    <span class="pks-val neon-gold" id="dash-split-completed-count">0 / 7</span>
+                    <span class="pks-lbl">Cycle Done</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Career Engine Progress (from Career Engine Page) -->
+            <div class="glass-panel pillar-stat-card">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">CAREER ENGINE // 15+ LPA FMCG GATE</span>
+                  <h4 class="psc-title">5 Core Execution Tracks</h4>
+                </div>
+                <span class="badge-gold" id="dash-career-gate-badge">0 / 5 Done</span>
+              </div>
+
+              <div class="psc-body">
+                <!-- 5-Track Execution Multi-Day Sprint Chart -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">5-Track Sprint History</span>
+                    <span class="psc-mb-val neon-gold">Execution Volume</span>
+                  </div>
+                  <div class="chart-canvas-small-wrap" title="5-Track Execution Multi-Day Sprint Chart">
+                    <canvas id="dash-career-history-canvas" width="380" height="140"></canvas>
+                  </div>
+                </div>
+
+                <!-- 5 Tracks Progress Matrix -->
+                <div class="dash-career-tracks-list" id="dash-career-tracks-list">
+                  <!-- Dynamic 5 tracks (SNS, Consumo, Apply, Excel, MLOps) with tick and status -->
+                </div>
+
+                <!-- Overall Career Gate Progress Bar -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">15+ LPA FMCG Boss HP Gate</span>
+                    <span class="psc-mb-val neon-gold" id="dash-career-gate-pct">0% Cleared</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill gold-fill" id="dash-career-gate-fill" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Character & Mindset Progress (from Character & Mindset Page) -->
+            <div class="glass-panel pillar-stat-card">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">CHARACTER & MINDSET // MONARCH'S AURA</span>
+                  <h4 class="psc-title">Internal Frequency & Stoic Aura</h4>
+                </div>
+                <span class="badge-purple" id="dash-aura-tier-badge">TIER 1 (AWAKENED)</span>
+              </div>
+
+              <div class="psc-body">
+                <!-- Mood / Frequency Meter (1 to 10) -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Daily Mood / Internal Frequency</span>
+                    <span class="psc-mb-val neon-cyan" id="dash-mood-val">8 / 10</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill" id="dash-mood-fill" style="width: 80%"></div>
+                  </div>
+                  <span class="psc-sub-hint" id="dash-mood-desc">Grounded & Focused • Calm Sovereign Presence</span>
+                </div>
+
+                <!-- Stoic Mood & Frequency Trend Curve (1 to 10) -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Frequency Curve (1 to 10)</span>
+                    <span class="psc-mb-val neon-purple">Stoic Composure</span>
+                  </div>
+                  <div class="chart-canvas-small-wrap" title="Stoic Mood & Frequency Trend Curve (1 to 10)">
+                    <canvas id="dash-mood-history-canvas" width="380" height="140"></canvas>
+                  </div>
+                </div>
+
+                <!-- 7 Sovereign Aura Habits Progress -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">7 Sovereign Aura Habits</span>
+                    <span class="psc-mb-val neon-purple" id="dash-aura-habits-ratio">0 / 7 Active</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill purple-fill" id="dash-aura-habits-fill" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <!-- Gratitude to God Status -->
+                <div class="psc-footer-pill" id="dash-gratitude-pill">
+                  <span class="f-pill-icon">🙏</span>
+                  <span class="f-pill-text" id="dash-gratitude-status">Gratitude to God: Pending Today</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: Purity & Control Progress (from Purity Page) -->
+            <div class="glass-panel pillar-stat-card">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">PURITY & CONTROL // LUST DEFENSE</span>
+                  <h4 class="psc-title">Clean Streak & Milestone Roadmap</h4>
+                </div>
+                <span class="badge-cyan" id="dash-purity-streak-badge">1 Day Clean</span>
+              </div>
+
+              <div class="psc-body">
+                <!-- Milestone Progression Bar -->
+                <div class="purity-milestones-chart">
+                  <div class="pm-steps-track">
+                    <div class="pm-step-node" id="pms-3">
+                      <span class="pms-day">D3</span>
+                      <span class="pms-lbl">Clear Mind</span>
+                    </div>
+                    <div class="pm-step-node" id="pms-7">
+                      <span class="pms-day">D7</span>
+                      <span class="pms-lbl">Willpower</span>
+                    </div>
+                    <div class="pm-step-node" id="pms-14">
+                      <span class="pms-day">D14</span>
+                      <span class="pms-lbl">Reset</span>
+                    </div>
+                    <div class="pm-step-node" id="pms-30">
+                      <span class="pms-day">D30</span>
+                      <span class="pms-lbl">Unshakable</span>
+                    </div>
+                    <div class="pm-step-node" id="pms-90">
+                      <span class="pms-day">D90</span>
+                      <span class="pms-lbl">Mastery</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Streak Progress to Next Milestone -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label" id="dash-purity-next-label">Progress to Next Milestone</span>
+                    <span class="psc-mb-val neon-cyan" id="dash-purity-next-val">1 / 3 Days</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill" id="dash-purity-milestone-fill" style="width: 33%"></div>
+                  </div>
+                </div>
+
+                <!-- Dopamine Reclaim Note -->
+                <div class="psc-footer-pill">
+                  <span class="f-pill-icon">⚡</span>
+                  <span class="f-pill-text">10-Year Dopamine Reclaim Active • Zero Indulgence</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6: Smoke-Free Progress (from Smoke-Free Page) -->
+            <div class="glass-panel pillar-stat-card">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">SMOKE-FREE LIVING // HEALTH ENGINE</span>
+                  <h4 class="psc-title">Biological Detox & Recovery Meters</h4>
+                </div>
+                <span class="badge-success" id="dash-smoke-clean-badge">Clean</span>
+              </div>
+
+              <div class="psc-body">
+                <!-- 3 Bio Recovery Meters -->
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Carbon Monoxide Cleared (8h)</span>
+                    <span class="psc-mb-val neon-green" id="dash-bio-co-text">100%</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill green-fill" id="dash-bio-co-fill" style="width: 100%"></div>
+                  </div>
+                </div>
+
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Nicotine Cleared from Blood (72h)</span>
+                    <span class="psc-mb-val neon-green" id="dash-bio-nic-text">0%</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill green-fill" id="dash-bio-nic-fill" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Circulation & Breathing Surge (14d)</span>
+                    <span class="psc-mb-val neon-green" id="dash-bio-lung-text">0%</span>
+                  </div>
+                  <div class="gauge-track">
+                    <div class="gauge-fill green-fill" id="dash-bio-lung-fill" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <!-- Wealth & Cigs Saved Row -->
+                <div class="psc-kpi-summary-row">
+                  <div class="pks-item">
+                    <span class="pks-val neon-green" id="dash-saved-money-kpi">₹0</span>
+                    <span class="pks-lbl">Money Saved</span>
+                  </div>
+                  <div class="pks-item">
+                    <span class="pks-val neon-cyan" id="dash-cigs-avoided-kpi">0</span>
+                    <span class="pks-lbl">Cigs Avoided</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 7: Daily Diary Progress & Reflections (from Daily Diary Page) -->
+            <div class="glass-panel pillar-stat-card full-width-card" style="grid-column: 1 / -1;">
+              <div class="psc-header">
+                <div class="psc-title-group">
+                  <span class="panel-tag">DAILY DIARY // SOVEREIGN REFLECTIONS</span>
+                  <h4 class="psc-title">Journal Logs & Mood Alignment</h4>
+                </div>
+                <span class="badge-cyan" id="dash-diary-count-badge">0 Entries</span>
+              </div>
+
+              <div class="psc-body">
+                <div class="psc-metric-block">
+                  <div class="psc-mb-header">
+                    <span class="psc-mb-label">Latest Recorded Thought & Lessons</span>
+                    <span class="psc-mb-val neon-cyan" id="dash-card-diary-status">No Entry Today</span>
+                  </div>
+                  <div class="dash-card-diary-snippet" id="dash-card-diary-text">
+                    No Daily Diary reflection recorded for today yet. Write down your honest thoughts, lessons, and wins to seal your mindset.
+                  </div>
+                </div>
+
+                <div class="psc-action-row" style="margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="action-btn btn-cyan-glow btn-sm" id="btn-dash-write-diary">
+                    Write in Daily Diary (+50 XP)
+                  </button>
+                  <button class="btn-secondary-hud btn-sm" id="btn-dash-view-all-diary">
+                    Open Daily Diary Page ➔
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: GitHub-Style 26-Week Campaign Activity & Discipline Heatmap -->
+          <div class="glass-panel heatmap-card">
+            <div class="panel-header">
+              <span class="panel-tag">CAMPAIGN DISCIPLINE HEATMAP // OCT 5, 2026 ➔ APR 1, 2027</span>
+              <span class="panel-id">178-DAY PROTOCOL CONSISTENCY</span>
+            </div>
+            
+            <div class="heatmap-scroll-wrap">
+              <div id="campaign-heatmap-grid">
+                <!-- Populated dynamically via charts.js -->
+              </div>
+            </div>
+
+            <div class="heatmap-footer">
+              <span class="hf-note">Hover any block to inspect historical daily protocol logs and check-in integrity.</span>
+              <div class="heatmap-legend">
+                <span>Less</span>
+                <span class="legend-swatch" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);"></span>
+                <span class="legend-swatch" style="background: rgba(16, 185, 129, 0.35);"></span>
+                <span class="legend-swatch" style="background: rgba(16, 185, 129, 0.7);"></span>
+                <span class="legend-swatch" style="background: var(--neon-cyan);"></span>
+                <span class="legend-swatch" style="background: rgba(168, 85, 247, 0.7);" title="Frozen Stasis Day"></span>
+                <span>More (Sovereign)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Calendar View & Historical Protocol & Diary Inspector -->
+          <div class="glass-panel calendar-inspector-panel">
+            <div class="panel-header">
+              <div class="panel-tag-group">
+                <span class="panel-tag">CALENDAR VIEW // HISTORICAL PROTOCOL & DIARY INSPECTOR</span>
+                <span class="panel-sub-hint">Click any date to inspect overall performance and saved Dear Diary reflections</span>
+              </div>
+              <span class="panel-id" id="cal-inspector-mode">OCTOBER 2026</span>
+            </div>
+
+            <div class="cal-inspector-grid">
+              <!-- Left Side: Interactive Calendar Widget matching user reference -->
+              <div class="cal-widget-box">
+                <div class="cal-header-row">
+                  <h3 class="cal-month-title" id="cal-month-title">October 2026</h3>
+                  <div class="cal-nav-buttons">
+                    <button class="cal-nav-btn" id="cal-prev-btn" title="Previous Month">▲</button>
+                    <button class="cal-nav-btn" id="cal-next-btn" title="Next Month">▼</button>
+                    <button class="cal-today-btn" id="cal-today-btn">Today</button>
+                  </div>
+                </div>
+
+                <div class="cal-weekdays-grid">
+                  <span>Su</span>
+                  <span>Mo</span>
+                  <span>Tu</span>
+                  <span>We</span>
+                  <span>Th</span>
+                  <span>Fr</span>
+                  <span>Sa</span>
+                </div>
+
+                <div class="cal-days-grid" id="cal-days-grid">
+                  <!-- Generated dynamically via main.js -->
+                </div>
+
+                <div class="cal-footnote">
+                  <div class="cf-item"><span class="cal-legend-dot dot-coral"></span> Selected Date</div>
+                  <div class="cf-item"><span class="cal-legend-dot dot-green"></span> Completed Log</div>
+                  <div class="cf-item"><span class="cal-legend-dot dot-purple"></span> Stasis Freeze</div>
+                </div>
+              </div>
+
+              <!-- Right Side: Overall Report & Saved Daily Diary for Selected Date -->
+              <div class="cal-report-box" id="cal-day-report-box">
+                <div class="cdr-header">
+                  <div>
+                    <span class="cdr-sub-tag">OVERALL PROTOCOL REPORT</span>
+                    <h3 class="cdr-date-title" id="cdr-date-title">Sunday, October 4, 2026</h3>
+                  </div>
+                  <span class="badge-amber" id="cdr-status-badge">PRE-CAMPAIGN // STARTS OCT 5</span>
+                </div>
+
+                <!-- Metrics Summary Grid for Selected Date -->
+                <div class="cdr-metrics-grid">
+                  <div class="cdr-metric-card">
+                    <span class="cdr-m-label">DAILY XP</span>
+                    <span class="cdr-m-val neon-cyan" id="cdr-xp-val">0 XP</span>
+                  </div>
+                  <div class="cdr-metric-card">
+                    <span class="cdr-m-label">ROUTINE & PROTEIN</span>
+                    <span class="cdr-m-val neon-amber" id="cdr-routine-val">0 Tasks • 0g</span>
+                  </div>
+                  <div class="cdr-metric-card">
+                    <span class="cdr-m-label">WORKOUT & SPLIT</span>
+                    <span class="cdr-m-val neon-green" id="cdr-forge-val">Rest Day</span>
+                  </div>
+                  <div class="cdr-metric-card">
+                    <span class="cdr-m-label">CAREER 5-TRACKS</span>
+                    <span class="cdr-m-val neon-gold" id="cdr-career-val">0 / 5 Done</span>
+                  </div>
+                  <div class="cdr-metric-card">
+                    <span class="cdr-m-label">STOIC FREQUENCY</span>
+                    <span class="cdr-m-val neon-purple" id="cdr-mood-val">— / 10</span>
+                  </div>
+                  <div class="cdr-metric-card">
+                    <span class="cdr-m-label">PURITY & SMOKE</span>
+                    <span class="cdr-m-val neon-cyan" id="cdr-purity-val">Clean</span>
+                  </div>
+                </div>
+
+                <!-- Saved Daily Diary Section for Selected Date -->
+                <div class="cdr-diary-card">
+                  <div class="cdr-diary-header">
+                    <div class="cdr-dh-left">
+                      <span class="panel-tag">SAVED DEAR DIARY REMARK FOR THIS DATE</span>
+                      <span class="badge-cyan" id="cdr-diary-mood-badge">NOT LOGGED</span>
+                    </div>
+                    <button class="btn-secondary-hud btn-sm" id="cdr-open-diary-btn">Write / Open Diary ➔</button>
+                  </div>
+                  
+                  <div class="cdr-diary-content" id="cdr-diary-content">
+                    <div class="cdr-empty-diary">
+                      <p id="cdr-empty-diary-msg">No Daily Diary reflection recorded for this date.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 2: DEAR DIARY (JOURNAL & REMARKS) -->
+        <!-- ============================================ -->
+        <section id="tab-diary" class="tab-panel">
+          <div class="diary-layout-grid">
+            
+            <!-- Write Entry Card -->
+            <div class="glass-panel diary-editor-card">
+              <div class="panel-header">
+                <span class="panel-tag">DEAR DIARY // TODAY'S REMARK</span>
+                <span class="panel-id" id="diary-current-date-label">Today</span>
+              </div>
+
+              <div class="diary-form">
+                <div class="diary-meta-row">
+                  <div class="meta-field">
+                    <label>Today's Mood / State of Mind:</label>
+                    <select id="diary-mood-select">
+                      <option value="Determined">Determined & Resolute</option>
+                      <option value="Peaceful">Peaceful & Grounded</option>
+                      <option value="Focused">Highly Focused</option>
+                      <option value="Challenging">Challenging / Temptations Overcome</option>
+                      <option value="Tired">Fatigued / Rest Needed</option>
+                      <option value="Victorious">Victorious / Won the Day</option>
+                    </select>
+                  </div>
+                  <div class="meta-field flex-grow">
+                    <label>Subject / Headline:</label>
+                    <input type="text" id="diary-title-input" placeholder="e.g. Overcame a tough urge, hit chest day at gym..." />
+                  </div>
+                </div>
+
+                <div class="meta-field">
+                  <label>Dear Diary (Write your honest thoughts, reflections, lessons, or feelings):</label>
+                  <textarea id="diary-text-input" rows="8" placeholder="Dear Diary, today I felt... I caught myself when... I was grateful for... What I will do better tomorrow is..."></textarea>
+                </div>
+
+                <div class="diary-action-row">
+                  <button class="action-btn btn-cyan-glow" id="btn-save-diary-entry">
+                    Save Diary Entry (+50 XP)
+                  </button>
+                  <span class="small-text text-muted">Entries are saved locally and completely private.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Past Entries Archive -->
+            <div class="glass-panel diary-history-card">
+              <div class="panel-header">
+                <span class="panel-tag">DIARY ARCHIVES</span>
+                <span class="panel-id" id="diary-entries-count">1 Entry</span>
+              </div>
+
+              <div class="diary-entries-list" id="diary-entries-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 3: PURITY & CONTROL (LUST DEFENSE) -->
+        <!-- ============================================ -->
+        <section id="tab-purity" class="tab-panel">
+          <div class="pillar-grid">
+            
+            <div class="glass-panel main-hero-card">
+              <div class="panel-header">
+                <span class="panel-tag">SELF-CONTROL & INTEGRITY</span>
+                <span class="badge-danger">CODE RED DEFENSE</span>
+              </div>
+              <h2 class="pillar-title">Purity & Energy Retention</h2>
+              <p class="pillar-desc">Breaking the 10-year lust loop. Reclaiming dopamine sensitivity, mental sharpness, masculine vitality, and unshakeable self-respect.</p>
+
+              <div class="streak-counter-box">
+                <div class="counter-number neon-cyan" id="purity-streak-days">1</div>
+                <div class="counter-label">CLEAN DAYS IN A ROW</div>
+                <div class="counter-sub" id="purity-streak-hours">24 Hours Clean</div>
+              </div>
+
+              <!-- Milestones -->
+              <div class="milestones-track-wrapper">
+                <div class="milestones-title">PROGRESS MILESTONES:</div>
+                <div class="milestones-grid">
+                  <div class="milestone-badge" id="m-pur-3">
+                    <span class="m-day">DAY 3</span>
+                    <span class="m-reward">Clear Mind (+100 XP)</span>
+                  </div>
+                  <div class="milestone-badge" id="m-pur-7">
+                    <span class="m-day">DAY 7</span>
+                    <span class="m-reward">Willpower Boost (+300 XP)</span>
+                  </div>
+                  <div class="milestone-badge" id="m-pur-14">
+                    <span class="m-day">DAY 14</span>
+                    <span class="m-reward">Dopamine Reset (+600 XP)</span>
+                  </div>
+                  <div class="milestone-badge" id="m-pur-30">
+                    <span class="m-day">DAY 30</span>
+                    <span class="m-reward">Unshakable (+1500 XP)</span>
+                  </div>
+                  <div class="milestone-badge" id="m-pur-90">
+                    <span class="m-day">DAY 90</span>
+                    <span class="m-reward">Complete Mastery</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pillar-action-row">
+                <button class="action-btn btn-danger-glow" id="btn-trigger-panic-modal">
+                  Trigger Code Red Urge Help
+                </button>
+                <button class="action-btn btn-secondary-hud" id="btn-open-breach-modal">
+                  Report Slip / Vulnerability (No Guilt)
+                </button>
+              </div>
+            </div>
+
+            <!-- Negative Effects of Lust & What It Steals -->
+            <div class="glass-panel">
+              <div class="panel-header">
+                <span class="panel-tag">NEGATIVE EFFECTS OF LUST</span>
+                <span class="badge-danger">WHAT IT STEALS</span>
+              </div>
+              <h3 class="card-subtitle">The True Cost of the Loop</h3>
+              <p class="small-text">Lust tricks your brain with a 5-second fantasy, but leaves you paying the price for days:</p>
+
+              <div class="lust-effects-list">
+                <div class="effect-item">
+                  
+                  <div class="effect-text">
+                    <strong>Brain Fog & Memory Drain:</strong> Dries up mental clarity, killing your ability to solve complex FMCG data science algorithms and speak sharply in interviews.
+                  </div>
+                </div>
+                <div class="effect-item">
+                  
+                  <div class="effect-text">
+                    <strong>Guilt, Shame & Moral Misery:</strong> The instant sickening drop right after indulgence that destroys self-respect and leaves you feeling worthless.
+                  </div>
+                </div>
+                <div class="effect-item">
+                  
+                  <div class="effect-text">
+                    <strong>Loss of Masculine Drive:</strong> Drains raw physical energy and confidence, making you feel timid, awkward, and weak around others.
+                  </div>
+                </div>
+                <div class="effect-item">
+                  
+                  <div class="effect-text">
+                    <strong>The Domino Collapse:</strong> Triggers the anxiety loop that makes you want to smoke cigarettes, eat junk food, and skip the gym.
+                  </div>
+                </div>
+              </div>
+
+              <div class="lust-anchor-quote">
+                "5 seconds of fake pleasure is never worth sacrificing your self-respect and your future."
+              </div>
+            </div>
+
+            <!-- Breach Log Table -->
+            <div class="glass-panel full-width">
+              <div class="panel-header">
+                <span class="panel-tag">VULNERABILITY & TRIGGER LOG</span>
+                <span class="panel-id">OBJECTIVE DATA</span>
+              </div>
+              <div class="breach-table-wrapper">
+                <table class="hud-table">
+                  <thead>
+                    <tr>
+                      <th>DATE & TIME</th>
+                      <th>SLIP TYPE</th>
+                      <th>TIME OF DAY</th>
+                      <th>ROOT TRIGGER</th>
+                      <th>LESSON & FIX</th>
+                    </tr>
+                  </thead>
+                  <tbody id="breach-log-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 4: SMOKE-FREE (CLEAN ENGINE) -->
+        <!-- ============================================ -->
+        <section id="tab-engine" class="tab-panel">
+          <div class="pillar-grid">
+            
+            <div class="glass-panel main-hero-card">
+              <div class="panel-header">
+                <span class="panel-tag">LUNG HEALTH & CLEAN BLOOD</span>
+                <span class="badge-success">NICOTINE DETOX</span>
+              </div>
+              <h2 class="pillar-title">Smoke-Free Living</h2>
+              <p class="pillar-desc">6 years of smoking ends now. Watch your lungs, stamina, and circulation heal in real time.</p>
+
+              <div class="smoke-timer-box">
+                <div class="smoke-timer-val neon-green" id="smoke-free-counter">00d 14h 00m</div>
+                <div class="smoke-timer-sub">CONTINUOUS SMOKE-FREE TIME</div>
+              </div>
+
+              <!-- Bio Recovery Meters -->
+              <div class="bio-recovery-section">
+                <div class="bio-bar-item">
+                  <div class="bio-label">
+                    <span>Carbon Monoxide Level Normalized (8 Hours)</span>
+                    <span id="bio-co-text">100% Cleared</span>
+                  </div>
+                  <div class="bio-track"><div class="bio-fill" id="bio-co-fill" style="width: 100%"></div></div>
+                </div>
+                <div class="bio-bar-item">
+                  <div class="bio-label">
+                    <span>Nicotine Cleared from Bloodstream (72 Hours)</span>
+                    <span id="bio-nic-text">0%</span>
+                  </div>
+                  <div class="bio-track"><div class="bio-fill" id="bio-nic-fill" style="width: 25%"></div></div>
+                </div>
+                <div class="bio-bar-item">
+                  <div class="bio-label">
+                    <span>Circulation & Breathing Power Surge (+20% in 14 Days)</span>
+                    <span id="bio-lung-text">0%</span>
+                  </div>
+                  <div class="bio-track"><div class="bio-fill" id="bio-lung-fill" style="width: 15%"></div></div>
+                </div>
+              </div>
+
+              <div class="pillar-action-row">
+                <button class="action-btn btn-cyan-glow" id="btn-start-craving-surfer">
+                  3-Minute Craving Surfer (Breathing Tool)
+                </button>
+              </div>
+            </div>
+
+            <!-- Savings Metrics -->
+            <div class="glass-panel">
+              <div class="panel-header">
+                <span class="panel-tag">SAVINGS & HEALTH REGAINED</span>
+                <span class="panel-id">WEALTH RETAINED</span>
+              </div>
+
+              <div class="savings-metrics-grid">
+                <div class="metric-box">
+                  <div class="metric-num neon-cyan" id="metric-cigs-avoided">2</div>
+                  <div class="metric-title">Cigarettes Avoided (2/day)</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-num neon-green" id="metric-smoke-cash">₹50</div>
+                  <div class="metric-title">Money Saved (₹25/cig)</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-num neon-amber" id="metric-life-regained">1 hr</div>
+                  <div class="metric-title">Life Regained</div>
+                </div>
+              </div>
+
+              <!-- The 3-Minute Biology Rule -->
+              <div class="craving-science-card">
+                <h4>The 3-Minute Biology Rule:</h4>
+                <p>A severe nicotine craving lasts only <strong>3 to 5 minutes</strong> before receptors fatigue. If you outlast the wave without smoking, the craving collapses.</p>
+              </div>
+
+              <!-- Emotional Reality Check: Burning Food vs Smoke -->
+              <div class="smoke-perspective-card">
+                <div class="sp-header">
+                  <span class="sp-tag">EMOTIONAL REALITY CHECK</span>
+                  <span class="sp-badge-amber">BURNING FOOD VS SMOKE</span>
+                </div>
+                <div class="sp-impact-box">
+                  <div class="sp-meal-count" id="smoke-meals-saved-badge">₹0 Saved = 0 Warm Meals for someone in need</div>
+                </div>
+                <p class="sp-guilt-text">
+                  Every <strong>₹25 cigarette</strong> is a meal literally snatched from a starving stomach and burned into black tar inside your lungs. While a poor person or a hungry child on the street sleeps on an empty stomach praying for just ₹25 to eat, you were lighting that exact money on fire just to poison your blood, ruin your stamina, and smell like ash.
+                </p>
+                <div class="sp-anchor-prompt">
+                  "Next time your fingers reach for a cigarette, look at that ₹25 note: Are you really going to burn food out of a hungry person's mouth just to poison your own body?"
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 5: FITNESS & BODY (THE IRON FORGE) -->
+        <!-- ============================================ -->
+        <section id="tab-forge" class="tab-panel">
+          
+          <!-- 1. HERO COMMAND BAR & STATS ROW -->
+          <div class="glass-panel forge-hero-card">
+            <div class="forge-hero-header">
+              <div class="forge-title-group">
+                <div class="forge-tag-row">
+                  <span class="panel-tag">PILLAR // PHYSICAL DOMINANCE</span>
+                  <span class="badge-amber" id="gym-today-badge">TODAY: SUNDAY</span>
+                </div>
+                <h2 class="forge-main-title">The Iron Forge</h2>
+                <p class="forge-tagline">Physical strength builds unshakeable confidence. Mon-Sat Push/Pull/Legs workout cycle with Sunday recovery.</p>
+              </div>
+            </div>
+
+            <!-- 4-Stat Metric Row -->
+            <div class="forge-metrics-bar">
+              <div class="forge-metric-tile">
+                <span class="fmt-val neon-amber" id="gym-workouts-done">0</span>
+                <span class="fmt-label">TOTAL WORKOUTS</span>
+              </div>
+              <div class="forge-metric-tile">
+                <span class="fmt-val neon-cyan" id="gym-current-streak">0</span>
+                <span class="fmt-label">DAY STREAK</span>
+              </div>
+              <div class="forge-metric-tile">
+                <span class="fmt-val neon-green" id="gym-body-phase">REST DAY</span>
+                <span class="fmt-label">TODAY'S SPLIT</span>
+              </div>
+              <div class="forge-metric-tile">
+                <span class="fmt-val neon-purple" id="gym-status-badge">RECOVERY</span>
+                <span class="fmt-label">FORGE STATUS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. FULL-WIDTH 7-DAY SPLIT SCHEDULE -->
+          <div class="glass-panel forge-split-card">
+            <div class="fsc-header">
+              <div class="fsc-header-left">
+                <span class="panel-tag">WEEKLY CYCLE</span>
+                <h3 class="fsc-title">7-Day Workout Split Tracker</h3>
+                <p class="fsc-desc">Click any split badge to cycle exercises (Legs, Pull, Push, Rest, Cardio, Arms). Click 'Mark Done' to seal completion (+40 XP).</p>
+              </div>
+              <div class="fsc-controls">
+                <button class="btn-secondary-hud btn-xs" id="btn-reset-default-schedule" title="Reset standard Mon-Sat PPL split">
+                  Reset PPL Split
+                </button>
+                <button class="action-btn btn-cyan-glow btn-xs" id="btn-save-weekly-calendar">
+                  Save Schedule (+50 XP)
+                </button>
+              </div>
+            </div>
+
+            <div class="weekly-split-row" id="weekly-calendar-grid">
+              <!-- 7 clean, wide, beautifully styled cards (Mon to Sun) populated dynamically -->
+            </div>
+          </div>
+
+          <!-- 3. STRENGTH TRAINING & CALISTHENICS LOGGER -->
+          <div class="glass-panel forge-strength-card">
+            <div class="fsc-header">
+              <div class="fsc-header-left">
+                <span class="panel-tag">DAILY STRENGTH & CALISTHENICS</span>
+                <h3 class="fsc-title">Strength Sets Logger</h3>
+                <p class="fsc-desc">Log your push-ups, pull-ups, squats, or gym sets. Tick off exercises to lock in XP (+25 XP each, reversible).</p>
+              </div>
+              <span class="badge-cyan" id="strength-logged-count">0 Exercises Logged</span>
+            </div>
+
+            <div class="strength-builder-grid">
+              <!-- Left side: Fast Input & Presets -->
+              <div class="strength-input-panel">
+                <div class="sip-row">
+                  <div class="sip-field flex-grow">
+                    <label class="sip-label">Exercise / Workout</label>
+                    <input type="text" id="input-strength-exercise-name" placeholder="e.g., Push-ups, Pull-ups, Dead Hang..." />
+                  </div>
+                  <div class="sip-field sets-field">
+                    <label class="sip-label">Sets</label>
+                    <input type="number" id="input-strength-sets-num" min="1" max="50" value="3" />
+                  </div>
+                  <button class="action-btn btn-cyan-glow" id="btn-add-strength-exercise">
+                    + Add
+                  </button>
+                </div>
+
+                <div class="quick-presets-group">
+                  <span class="qpg-label">Quick Presets:</span>
+                  <div class="qpg-chips">
+                    <button type="button" class="preset-chip" data-name="Push-ups" data-sets="3">Push-ups</button>
+                    <button type="button" class="preset-chip" data-name="Incline Push-ups" data-sets="3">Incline Push-ups</button>
+                    <button type="button" class="preset-chip" data-name="Pull-ups / Chin-ups" data-sets="3">Pull-ups</button>
+                    <button type="button" class="preset-chip" data-name="Active Bar Dead Hangs" data-sets="3">Dead Hangs</button>
+                    <button type="button" class="preset-chip" data-name="Bodyweight Squats" data-sets="4">Squats</button>
+                    <button type="button" class="preset-chip" data-name="Dips" data-sets="3">Dips</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right side: Clean checklist of today's exercises -->
+              <div class="strength-list-panel">
+                <div class="strength-exercises-list" id="strength-exercises-list">
+                  <!-- Dynamically populated -->
+                </div>
+
+                <div class="strength-footer-actions">
+                  <button class="action-btn btn-amber-glow" id="btn-save-strength-session">
+                    Save Strength Session (+50 XP)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 6: DAILY ROUTINE (HUNTER'S FORM) -->
+        <!-- ============================================ -->
+        <!-- ============================================ -->
+        <!-- TAB 6: DAILY ROUTINE (HUNTER'S FORM) -->
+        <!-- ============================================ -->
+        <section id="tab-hunter" class="tab-panel">
+          <div class="pillar-grid">
+
+            <div class="glass-panel main-hero-card">
+              <div class="panel-header">
+                <span class="panel-tag">ROUTINE & LOOKSMAXXING</span>
+                <span class="badge-cyan">AESTHETICS & NUTRITION</span>
+              </div>
+              <h2 class="pillar-title">Morning, Evening & Clean Eating</h2>
+              <p class="pillar-desc">5 AM wake-up, 3L water, ice-pack skincare, 120g protein, 8h sleep, and pelvic tilt alignment.</p>
+
+              <div class="routine-dual-grid">
+                
+                <!-- Morning Routine -->
+                <div class="routine-col">
+                  <div class="routine-col-header">
+                    <h3>DAWN ROUTINE (5:00 AM)</h3>
+                    <span class="neon-tag" id="dawn-completion-status">0 / 4</span>
+                  </div>
+                  <div class="checklist-items" id="dawn-checklist-container">
+                    <!-- Populated dynamically: 5 AM, 3L Water, Ice Pack Skincare, Pelvic Exercise -->
+                  </div>
+                </div>
+
+                <!-- Night Routine -->
+                <div class="routine-col">
+                  <div class="routine-col-header">
+                    <h3>DUSK ROUTINE (9:30 PM)</h3>
+                    <span class="neon-tag" id="night-completion-status">0 / 4</span>
+                  </div>
+                  <div class="checklist-items" id="night-checklist-container">
+                    <!-- Populated dynamically: Screens off, Night skincare, Prayer/Thanks, 8h sleep -->
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Skin Glow Meter -->
+              <div class="glow-tracker-box">
+                <div class="glow-header">
+                  <span>SKIN GLOW & HEALTH METER</span>
+                  <span class="glow-percentage" id="skin-glow-percentage">0%</span>
+                </div>
+                <div class="glow-track">
+                  <div class="glow-fill" id="skin-glow-fill" style="width: 0%"></div>
+                </div>
+                <div class="glow-subtext">Factors: 5 AM Wake-up + 3L Water + Ice Pack Skincare + No Junk + 120g Protein + 8h Sleep.</div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: NUTRITION PROTOCOL & PROTEIN METER -->
+            <div class="routine-right-col">
+
+              <!-- Clean Fuel Shield (No Junk Food) -->
+              <div class="glass-panel anti-junk-panel">
+                <div class="panel-header">
+                  <span class="panel-tag">NUTRITION SHIELD</span>
+                  <span class="badge-green">CLEAN FUEL</span>
+                </div>
+                <h3 class="junk-title">Clean Fuel Shield (No Junk Food)</h3>
+                <p class="small-text text-muted" style="margin: 8px 0 16px 0;">
+                  Strict zero-junk policy: No oily fast food, fried snacks, takeout, or sugary sodas today. Fuel clean to power dopamine receptors and mental clarity.
+                </p>
+                <button class="action-btn btn-cyan-glow" id="btn-claim-anti-junk" style="width: 100%;">
+                  Claim Clean Fuel (+50 XP, +30 Gold)
+                </button>
+              </div>
+
+              <!-- Protein Intake Tracker (Target: 120g) -->
+              <div class="glass-panel protein-tracker-panel">
+                <div class="panel-header">
+                  <span class="panel-tag">PROTEIN INTAKE METER</span>
+                  <span class="pt-target-badge font-mono">TARGET: 120 GM</span>
+                </div>
+                <h3 class="protein-title">Daily Protein Intake</h3>
+
+                <div class="pt-progress-wrapper" style="margin: 14px 0;">
+                  <div class="pt-progress-labels">
+                    <span id="protein-current-display" class="font-mono neon-cyan">0 / 120 gm</span>
+                    <span id="protein-percent-display" class="font-mono">0%</span>
+                  </div>
+                  <div class="pt-progress-track">
+                    <div class="pt-progress-fill" id="protein-progress-fill" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <div class="protein-input-row" style="margin-bottom: 12px;">
+                  <div class="input-field protein-field" style="flex: 1;">
+                    <label>Enter Protein (grams):</label>
+                    <input type="number" id="input-protein-grams" min="0" max="300" placeholder="e.g. 120" />
+                  </div>
+                  <button class="action-btn btn-amber-glow" id="btn-save-protein">
+                    Save Protein (+40 XP)
+                  </button>
+                </div>
+
+                <!-- Quick Add Chips -->
+                <div class="quick-protein-chips">
+                  <span class="qp-label">Quick add:</span>
+                  <button class="qp-chip" data-grams="20">+20g (Eggs / Scoop)</button>
+                  <button class="qp-chip" data-grams="30">+30g (Chicken / Paneer)</button>
+                  <button class="qp-chip" data-grams="15">+15g (Sprouts / Curd)</button>
+                  <button class="qp-chip" data-grams="40">+40g (Protein Meal)</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 7: CHARACTER & MINDSET (MONARCH'S AURA) -->
+        <!-- ============================================ -->
+        <section id="tab-aura" class="tab-panel">
+          <div class="pillar-grid">
+
+            <div class="glass-panel main-hero-card">
+              <div class="panel-header">
+                <span class="panel-tag">AURA BUILDING & SOVEREIGNTY</span>
+                <span class="badge-purple">HIGH SELF-RESPECT</span>
+              </div>
+              <h2 class="pillar-title">Uncompromising Self-Respect & Sovereign Aura</h2>
+              <p class="pillar-desc">The world only respects a man who fiercely respects himself. Zero clowning, zero people-pleasing, zero chasing validation. Move slowly, speak with intention, maintain unbending standards, and build a magnetic, unshakeable aura that commands respect in every room you enter.</p>
+
+              <!-- DAILY MOOD & AURA METER (1 TO 10) -->
+              <div class="daily-mood-meter-card glass-panel-inner">
+                <div class="dmm-header">
+                  <div class="dmm-title-group">
+                    <span class="dmm-badge-tag">DAILY FREQUENCY // MOOD METER</span>
+                    <h3 class="dmm-title">Internal Frequency & Mood (1 to 10)</h3>
+                  </div>
+                  <div class="dmm-score-pill" id="aura-mood-display">
+                    <span class="dmm-score-number" id="aura-mood-val">8</span>
+                    <span class="dmm-score-total">/ 10</span>
+                  </div>
+                </div>
+
+                <div class="dmm-scale-container" id="aura-mood-scale">
+                  <button type="button" class="mood-score-btn" data-score="1">1</button>
+                  <button type="button" class="mood-score-btn" data-score="2">2</button>
+                  <button type="button" class="mood-score-btn" data-score="3">3</button>
+                  <button type="button" class="mood-score-btn" data-score="4">4</button>
+                  <button type="button" class="mood-score-btn" data-score="5">5</button>
+                  <button type="button" class="mood-score-btn" data-score="6">6</button>
+                  <button type="button" class="mood-score-btn" data-score="7">7</button>
+                  <button type="button" class="mood-score-btn" data-score="8">8</button>
+                  <button type="button" class="mood-score-btn" data-score="9">9</button>
+                  <button type="button" class="mood-score-btn" data-score="10">10</button>
+                </div>
+
+                <div class="dmm-status-bar">
+                  <span class="dmm-status-label">STATUS:</span>
+                  <span class="dmm-status-desc" id="aura-mood-status">Grounded & Focused • Calm Sovereign Presence</span>
+                </div>
+              </div>
+
+              <!-- Aura Habits: 7 Box-type Clickable Habits -->
+              <div class="aura-checklist-box">
+                <h3>DAILY AURA & SELF-RESPECT HABITS:</h3>
+                <div class="aura-tasks" id="aura-tasks-container">
+                  <!-- Populated dynamically: Speak less, Slow movements, Lower reactivity, Seeking validation, Standards, Don't overshare, Ego hurt -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Dedicated Right Card: DAILY GRATITUDE TO GOD (Replaces Stoic Code) -->
+            <div class="glass-panel gratitude-main-panel">
+              <div class="panel-header">
+                <span class="panel-tag">DAILY GRATITUDE TO GOD</span>
+                <span class="badge-purple">FAITH & HUMILITY</span>
+              </div>
+              <h2 class="pillar-title">Gratitude to God</h2>
+              <p class="pillar-desc">Destroys resentment, kills arrogance, and grounds the soul in thankfulness to God every single day.</p>
+
+              <div class="gratitude-journal-box">
+                <div class="gratitude-header">
+                  <h3>3 DAILY BLESSINGS (GRATITUDE)</h3>
+                  <span class="small-tag text-muted">Acknowledge God's grace in your life</span>
+                </div>
+                <div class="gratitude-inputs">
+                  <input type="text" class="gratitude-input" id="gratitude-1" placeholder="1. I thank God for giving me life, breath, and a clear mind..." />
+                  <input type="text" class="gratitude-input" id="gratitude-2" placeholder="2. I thank God for my health, resilience, and opportunities..." />
+                  <input type="text" class="gratitude-input" id="gratitude-3" placeholder="3. I thank God for the strength to build an honorable life..." />
+                </div>
+                <button class="action-btn btn-purple-glow" id="btn-save-gratitude">
+                  Seal Today's Gratitude (+75 XP)
+                </button>
+              </div>
+
+              <div class="aura-xp-counter mt-4">
+                <span class="aura-label">CHARACTER MASTERY:</span>
+                <span class="aura-level neon-purple" id="aura-mastery-level">TIER 1 (AWAKENED)</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 8: CAREER ENGINE -->
+        <!-- ============================================ -->
+        <section id="tab-apex" class="tab-panel">
+          <div class="career-engine-container">
+
+            <!-- HEADER CONSOLE -->
+            <div class="glass-panel career-header-card">
+              <div class="panel-header">
+                <span class="panel-tag">PILLAR // CAREER ENGINE</span>
+              </div>
+              <h2 class="pillar-title">Career Engine</h2>
+            </div>
+
+            <!-- THE 5 CORE TRACKS GRID -->
+            <div class="career-five-tracks-grid" id="career-tracks-grid">
+              <!-- Populated dynamically with interactive check & reversible XP -->
+            </div>
+
+          </div>
+        </section>
+
+
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 1: EMERGENCY CODE RED (URGE DEFENSE) -->
+  <!-- ============================================ -->
+  <div class="system-modal" id="modal-emergency">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box emergency-modal-box pulse-crimson-border">
+      <div class="modal-header">
+        <span class="modal-badge-danger">EMERGENCY PROTOCOL: CODE RED</span>
+        <button class="modal-close-btn" id="btn-close-emergency">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2 class="emergency-title">URGE DETECTED: INTERCEPT THE LOOP</h2>
+        <p class="emergency-desc">Your brain is hijacked by an impulsive dopamine craving. Ground your physiology right now before your mind makes a foolish choice.</p>
+
+        <!-- 1-MINUTE RESET BREATHING CLOCK -->
+        <div class="emergency-breathing-card">
+          <div class="eb-top-bar">
+            <span class="eb-badge">1-MINUTE CONSCIOUS BREATHING RESET</span>
+            <span class="eb-status-tag" id="emergency-breathe-status">Take Deep Controlled Breaths</span>
+          </div>
+
+          <div class="eb-content-row">
+            <div class="eb-circle-visual" id="emergency-breathe-circle">
+              <span class="eb-timer-display" id="emergency-clock-timer">01:00</span>
+              <span class="eb-cue-sub" id="emergency-cue-text">INHALE</span>
+            </div>
+            <div class="eb-info-col">
+              <div class="eb-guidance-text" id="emergency-guidance-text">Inhale deeply through your nose for 4 seconds...</div>
+              <div class="eb-progress-track">
+                <div class="eb-progress-bar" id="emergency-clock-progress" style="width: 0%"></div>
+              </div>
+              <div class="eb-controls">
+                <button class="btn-sm btn-cyan-glow" id="btn-emergency-timer-toggle">⏸️ Pause</button>
+                <button class="btn-sm btn-secondary-hud" id="btn-emergency-timer-reset">Restart Clock</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="emergency-steps">
+          <div class="step-card">
+            <span class="step-num">STEP 1</span>
+            <div class="step-content">
+              <h4>CHANGE YOUR ENVIRONMENT (Immediate Physical Break):</h4>
+              <p>Drop your phone right now. Get off your bed, step out of the bedroom or bathroom, and walk to the living room or outdoors. Splash ice-cold water on your face. Break the isolation immediately.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">STEP 2</span>
+            <div class="step-content">
+              <h4>MOTIVATION & HOW I FELT (Post-Slip Reality Check):</h4>
+              <p>Recall the sickening drop 5 minutes after giving in: the disgusting guilt, brain fog, destroyed self-respect, and looking in the mirror hating the weakness. That 5-second cheap thrill is an illusion that leaves you drained and hating yourself. You promised you wouldn't feel that disgust again.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-num">STEP 3</span>
+            <div class="step-content">
+              <h4>YOUR PURPOSE & BREAK THE LOOP (Reclaim Your Kingdom):</h4>
+              <p>Do not repeat this 10-year loop! You are a 23-year-old Data Scientist destined for a 15+ LPA career, an elite Global MBA, and a dream physique. Saying NO right now permanently heals your brain and elevates your aura. Protect your future.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions-center">
+          <button class="action-btn btn-green-glow" id="btn-survived-urge">
+            I Overcame the Urge (+100 XP, +1 Aura)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 2: 3-MINUTE CRAVING WAVE SURFER -->
+  <!-- ============================================ -->
+  <div class="system-modal" id="modal-craving-surfer">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box craving-modal-box">
+      <div class="modal-header">
+        <span class="modal-badge-cyan">3-MINUTE CRAVING SURFER</span>
+        <button class="modal-close-btn" id="btn-close-surfer">&times;</button>
+      </div>
+      <div class="modal-body text-center">
+        <h3>Outlast the 3-minute craving spike.</h3>
+        <p>Inhale deeply as the circle expands, hold, and exhale as it contracts.</p>
+
+        <div class="breathing-circle-wrapper">
+          <div class="breathing-circle" id="breathing-anim-circle">
+            <span class="breathing-instruction">BREATHE</span>
+          </div>
+        </div>
+
+        <div class="surfer-timer neon-cyan" id="surfer-countdown">03:00</div>
+
+        <button class="action-btn btn-cyan-glow" id="btn-complete-wave">
+          I Surfed the Wave (+75 XP)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 3: SHIELD BREACH LOG -->
+  <!-- ============================================ -->
+  <div class="system-modal" id="modal-shield-breach">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-badge-amber">VULNERABILITY LOGGING</span>
+        <button class="modal-close-btn" id="btn-close-breach">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Zero self-blame or guilt. We analyze the situation so we can prevent it next time.</p>
+        
+        <div class="breach-form">
+          <div class="setting-field">
+            <label>Slip Type:</label>
+            <select id="breach-type-select">
+              <option value="Porn / Masturbation">Porn / Masturbation</option>
+              <option value="Late Night Phone Loop">Late Night Phone Loop</option>
+              <option value="Cigarette">Cigarette</option>
+              <option value="Junk Food">Junk Food Binge</option>
+            </select>
+          </div>
+          <div class="setting-field">
+            <label>What Triggered It?</label>
+            <input type="text" id="breach-trigger-input" placeholder="e.g. Late night alone in bed with phone, stress from work" />
+          </div>
+          <div class="setting-field">
+            <label>Action to Prevent It Next Time:</label>
+            <input type="text" id="breach-countermeasure-input" placeholder="e.g. Charge phone in another room, take cold shower" />
+          </div>
+          <button class="action-btn btn-cyan-glow" id="btn-submit-breach">Log & Reset Shield</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 4: LEVEL UP POPUP -->
+  <!-- ============================================ -->
+  <div class="system-modal" id="modal-level-up">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box level-up-modal-box pulse-cyan-border text-center">
+      <div class="modal-header text-center">
+        <span class="modal-badge-cyan">LEVEL ASCENSION</span>
+      </div>
+      <div class="modal-body text-center">
+        <h1 class="level-up-title neon-text">LEVEL UP!</h1>
+        <div class="level-up-number-box">
+          <span class="lvl-old" id="modal-old-level">1</span>
+          <span class="lvl-arrow">➔</span>
+          <span class="lvl-new neon-cyan" id="modal-new-level">2</span>
+        </div>
+        <p class="level-up-congrats">Your consistency is paying off. Keep building momentum.</p>
+        
+        <div class="level-up-rewards-list">
+          <div class="reward-pill">+3 Stat Points Distributed</div>
+          <div class="reward-pill">+100 Gold Earned</div>
+          <div class="reward-pill">Energy & Willpower Fully Restored</div>
+        </div>
+
+        <button class="action-btn btn-cyan-glow" id="btn-claim-level-up">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 5: FREEZE TODAY CONFIRMATION -->
+  <!-- ============================================ -->
+  <div class="system-modal" id="modal-freeze-confirm">
+    <div class="modal-backdrop" id="modal-freeze-backdrop"></div>
+    <div class="modal-box text-center pulse-cyan-border" style="max-width: 440px;">
+      <div class="modal-header text-center">
+        <span class="modal-badge-cyan">SYSTEM STASIS PROTOCOL</span>
+      </div>
+      <div class="modal-body text-center">
+        <h2 style="font-family: var(--font-hud); font-size: 1.25rem; margin-bottom: 12px; color: #fff;">ARE YOU SURE YOU WANT TO FREEZE TODAY?</h2>
+        <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin-bottom: 20px;">
+          Activating Stasis will lock all operational tasks and down pages for the rest of today. Your campaign will be extended by <strong>+1 Day</strong>, and your streaks will be protected.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button class="action-btn btn-cyan-glow" id="btn-confirm-freeze-action" style="padding: 10px 20px;">
+            Yes, Freeze Today
+          </button>
+          <button class="btn-secondary-hud" id="btn-cancel-freeze-action" style="padding: 10px 18px;">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  <!-- ============================================ -->
+  <!-- MODAL: CLOUD DATABASE SYNC (Supabase / Firebase) -->
+  <!-- ============================================ -->
+  <div class="system-modal" id="modal-cloud-sync">
+    <div class="modal-backdrop" id="modal-cloud-backdrop"></div>
+    <div class="modal-box cloud-modal-box pulse-cyan-border" style="max-width: 580px;">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge-cyan">MULTI-DEVICE CLOUD SYNC</span>
+          <h2 style="font-family: var(--font-hud); font-size: 1.15rem; margin: 4px 0 0 0; color: #fff;">Sync Phone &amp; PC Data</h2>
+        </div>
+        <button class="modal-close-btn" id="btn-close-cloud-sync">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: #94a3b8; font-size: 0.85rem; line-height: 1.5; margin-bottom: 14px;">
+          Connect your free <strong>Supabase</strong> or <strong>Firebase</strong> project so tasks, workouts, XP, and diary entries sync seamlessly across both your phone and laptop in real time.
+        </p>
+
+        <!-- Provider Select Tabs -->
+        <div class="cloud-provider-tabs">
+          <button type="button" class="cpt-tab active" data-provider="supabase" id="tab-provider-supabase">
+            Supabase (PostgreSQL • Recommended)
+          </button>
+          <button type="button" class="cpt-tab" data-provider="firebase" id="tab-provider-firebase">
+            Firebase (Firestore)
+          </button>
+        </div>
+
+        <!-- Status Card -->
+        <div class="cloud-status-card" id="cloud-modal-status-card">
+          <div class="csc-row">
+            <span class="csc-indicator dot-offline" id="cloud-modal-dot"></span>
+            <span class="csc-status-text" id="cloud-modal-status-text">Status: Offline (Local Storage Only)</span>
+          </div>
+          <span class="csc-timestamp" id="cloud-modal-timestamp">Last synced: Never</span>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="cloud-form-fields" style="margin-top: 14px;">
+          <!-- Supabase Fields -->
+          <div id="fields-supabase-group">
+            <div class="sip-field">
+              <label class="sip-label">Supabase Project URL</label>
+              <input type="text" id="input-supabase-url" placeholder="https://your-project.supabase.co" />
+              <span class="field-hint" style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Found in Supabase Dashboard ➔ Project Settings ➔ API</span>
+            </div>
+            <div class="sip-field" style="margin-top: 10px;">
+              <label class="sip-label">Supabase Anon Public API Key</label>
+              <input type="password" id="input-supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+              <span class="field-hint" style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Found in Supabase Dashboard ➔ Project Settings ➔ API (anon / public key)</span>
+            </div>
+          </div>
+
+          <!-- Firebase Fields -->
+          <div id="fields-firebase-group" style="display: none;">
+            <div class="sip-field">
+              <label class="sip-label">Firebase Project ID</label>
+              <input type="text" id="input-firebase-project-id" placeholder="my-life-os-project" />
+            </div>
+            <div class="sip-field" style="margin-top: 10px;">
+              <label class="sip-label">Firebase Web API Key (Optional)</label>
+              <input type="password" id="input-firebase-api-key" placeholder="AIzaSy..." />
+            </div>
+          </div>
+
+          <!-- Common Sync ID -->
+          <div class="sip-field" style="margin-top: 10px;">
+            <label class="sip-label">User / Sync Identifier</label>
+            <input type="text" id="input-sync-user-id" value="suhas_s" />
+            <span class="field-hint" style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Use this exact same ID on both phone and PC to sync into the same account profile.</span>
+          </div>
+
+          <!-- Auto-sync checkbox -->
+          <label style="margin-top: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: #cbd5e1; font-size: 0.82rem;">
+            <input type="checkbox" id="check-cloud-auto-sync" checked />
+            Automatically backup to cloud on every task update
+          </label>
+        </div>
+
+        <!-- Quick Setup SQL Help Toggle -->
+        <details class="cloud-sql-help" style="margin-top: 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px; background: rgba(0,0,0,0.35);">
+          <summary style="cursor: pointer; color: var(--neon-cyan); font-size: 0.78rem; font-weight: 600;">
+            🛠️ 1-Minute Supabase Database Setup SQL (Click to expand)
+          </summary>
+          <p style="font-size: 0.74rem; color: #94a3b8; margin: 8px 0 6px 0;">Paste this into your Supabase <strong>SQL Editor</strong> and click "Run":</p>
+          <pre style="background: #080c14; padding: 8px; border-radius: 4px; font-size: 0.72rem; color: #7dd3fc; overflow-x: auto; user-select: all; margin: 0; line-height: 1.4;">create table if not exists user_state (
+  id text primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+alter table user_state enable row level security;
+create policy "Allow all for anon" on user_state for all using (true) with check (true);</pre>
+        </details>
+
+        <!-- Actions -->
+        <div style="margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="action-btn btn-cyan-glow btn-sm" id="btn-save-cloud-config" style="flex: 1; min-width: 140px;">
+            Save &amp; Connect
+          </button>
+          <button class="btn-secondary-hud btn-sm" id="btn-cloud-pull-now" title="Fetch latest data from cloud">
+            ⬇️ Pull from Cloud
+          </button>
+          <button class="btn-secondary-hud btn-sm" id="btn-cloud-push-now" title="Send local data to cloud">
+            ⬆️ Push to Cloud
+          </button>
+          <button class="btn-secondary-hud btn-sm" id="btn-cloud-disconnect" style="color: #f87171;" title="Clear credentials">
+            Disconnect
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCRIPT ENTRY -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
