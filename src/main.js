@@ -13,7 +13,7 @@ import {
   renderCampaignHeatmap
 } from './charts.js';
 import { renderRadarChart } from './radar.js';
-import { loadState, saveState, calculateRank, getHistoricalTimeline } from './storage.js';
+import { loadState, saveState, calculateRank, getHistoricalTimeline, validateAndRepairState } from './storage.js';
 import { 
   getCloudConfig, 
   saveCloudConfig, 
@@ -801,25 +801,35 @@ export function getXpRequiredForLevel(level) {
 }
 
 export function addXp(amount, sourceTitle = '') {
-  state.player.xp += amount;
-  audio.playChime();
+  if (!state || !state.player || typeof state.player !== 'object') {
+    state = validateAndRepairState(state);
+  }
+  amount = Math.max(0, parseInt(amount, 10) || 0);
+  state.player.xp = (Number(state.player.xp) || 0) + amount;
+  
+  try {
+    audio.playChime();
+  } catch (e) {
+    // AudioContext might be waiting for user gesture
+  }
 
   while (state.player.xp >= state.player.xpRequired) {
     state.player.xp -= state.player.xpRequired;
-    state.player.level += 1;
+    state.player.level = (Number(state.player.level) || 1) + 1;
     state.player.xpRequired = getXpRequiredForLevel(state.player.level);
-    state.player.gold += 100;
-    state.player.unallocatedStatPoints += 3;
+    state.player.gold = (Number(state.player.gold) || 0) + 100;
+    state.player.unallocatedStatPoints = (Number(state.player.unallocatedStatPoints) || 0) + 3;
     state.player.hp = state.player.maxHp;
     state.player.mp = state.player.maxMp;
 
-    // Distribute stats
-    state.stats.pur += 1;
-    state.stats.vit += 1;
-    state.stats.str += 1;
-    state.stats.cha += 1;
-    state.stats.aura += 1;
-    state.stats.int += 1;
+    // Distribute stats safely
+    if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+    state.stats.pur = (Number(state.stats.pur) || 10) + 1;
+    state.stats.vit = (Number(state.stats.vit) || 10) + 1;
+    state.stats.str = (Number(state.stats.str) || 10) + 1;
+    state.stats.cha = (Number(state.stats.cha) || 10) + 1;
+    state.stats.aura = (Number(state.stats.aura) || 10) + 1;
+    state.stats.int = (Number(state.stats.int) || 10) + 1;
 
     const rankInfo = calculateRank(state.player.level);
     state.player.rank = rankInfo.rank;
@@ -829,25 +839,31 @@ export function addXp(amount, sourceTitle = '') {
   }
 
   saveState(state);
-  renderAll();
+  renderHud();
+  renderDashboardAnalytics();
 }
 
 export function reverseXp(amount, sourceTitle = '') {
-  state.player.xp -= amount;
+  if (!state || !state.player || typeof state.player !== 'object') {
+    state = validateAndRepairState(state);
+  }
+  amount = Math.max(0, parseInt(amount, 10) || 0);
+  state.player.xp = (Number(state.player.xp) || 0) - amount;
 
   while (state.player.xp < 0 && state.player.level > 1) {
     state.player.level -= 1;
     state.player.xpRequired = getXpRequiredForLevel(state.player.level);
     state.player.xp += state.player.xpRequired;
-    state.player.gold = Math.max(0, state.player.gold - 100);
-    state.player.unallocatedStatPoints = Math.max(0, state.player.unallocatedStatPoints - 3);
+    state.player.gold = Math.max(0, (Number(state.player.gold) || 0) - 100);
+    state.player.unallocatedStatPoints = Math.max(0, (Number(state.player.unallocatedStatPoints) || 0) - 3);
 
-    state.stats.pur = Math.max(10, state.stats.pur - 1);
-    state.stats.vit = Math.max(10, state.stats.vit - 1);
-    state.stats.str = Math.max(10, state.stats.str - 1);
-    state.stats.cha = Math.max(10, state.stats.cha - 1);
-    state.stats.aura = Math.max(10, state.stats.aura - 1);
-    state.stats.int = Math.max(10, state.stats.int - 1);
+    if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+    state.stats.pur = Math.max(10, (Number(state.stats.pur) || 10) - 1);
+    state.stats.vit = Math.max(10, (Number(state.stats.vit) || 10) - 1);
+    state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
+    state.stats.cha = Math.max(10, (Number(state.stats.cha) || 10) - 1);
+    state.stats.aura = Math.max(10, (Number(state.stats.aura) || 10) - 1);
+    state.stats.int = Math.max(10, (Number(state.stats.int) || 10) - 1);
 
     const rankInfo = calculateRank(state.player.level);
     state.player.rank = rankInfo.rank;
@@ -859,7 +875,8 @@ export function reverseXp(amount, sourceTitle = '') {
   }
 
   saveState(state);
-  renderAll();
+  renderHud();
+  renderDashboardAnalytics();
 }
 
 function triggerLevelUpModal(oldLvl, newLvl) {
@@ -1277,6 +1294,7 @@ function renderDailyQuests() {
     item.addEventListener('click', () => {
       const idx = parseInt(item.getAttribute('data-idx'), 10);
       const quest = state.dailyChecklist[idx];
+      if (!quest) return;
       if (isSystemInStasisToday()) {
         showToast('System In Stasis: Today is frozen. Nothing to tick.');
         return;
@@ -1284,18 +1302,20 @@ function renderDailyQuests() {
       quest.done = !quest.done;
 
       if (quest.done) {
-        audio.playQuestComplete();
-        state.player.gold += quest.gold;
+        try { audio.playQuestComplete(); } catch (e) {}
+        state.player.gold = (Number(state.player.gold) || 0) + (Number(quest.gold) || 0);
         addXp(quest.xp, quest.title);
       } else {
-        audio.playClick();
-        state.player.gold = Math.max(0, state.player.gold - quest.gold);
+        try { audio.playClick(); } catch (e) {}
+        state.player.gold = Math.max(0, (Number(state.player.gold) || 0) - (Number(quest.gold) || 0));
         reverseXp(quest.xp, quest.title);
         showToast(`Unticked: -${quest.xp} XP reversed`);
       }
 
       saveState(state);
-      renderAll();
+      renderDailyQuests();
+      renderHud();
+      renderDashboardAnalytics();
     });
   });
 }
@@ -1791,18 +1811,19 @@ function renderWeeklyCalendar() {
         const isDone = !state.pillarForge.weeklySchedule[dayKey].done;
         state.pillarForge.weeklySchedule[dayKey].done = isDone;
 
+        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
         if (isDone) {
-          audio.playQuestComplete();
-          state.pillarForge.workoutsDone = (state.pillarForge.workoutsDone || 0) + 1;
-          state.pillarForge.currentStreak = (state.pillarForge.currentStreak || 0) + 1;
-          state.stats.str += 1;
+          try { audio.playQuestComplete(); } catch (err) {}
+          state.pillarForge.workoutsDone = (Number(state.pillarForge.workoutsDone) || 0) + 1;
+          state.pillarForge.currentStreak = (Number(state.pillarForge.currentStreak) || 0) + 1;
+          state.stats.str = (Number(state.stats.str) || 10) + 1;
           addXp(40, `Completed ${state.pillarForge.weeklySchedule[dayKey].day} Split`);
           showToast(`Completed ${state.pillarForge.weeklySchedule[dayKey].day} Split: +40 XP`);
         } else {
-          audio.playClick();
+          try { audio.playClick(); } catch (err) {}
           if (state.pillarForge.workoutsDone > 0) state.pillarForge.workoutsDone--;
           if (state.pillarForge.currentStreak > 0) state.pillarForge.currentStreak--;
-          state.stats.str = Math.max(10, state.stats.str - 1);
+          state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
           reverseXp(40, `Reversed ${state.pillarForge.weeklySchedule[dayKey].day} Split`);
           showToast('Unticked workout split: -40 XP reversed');
         }
@@ -1847,13 +1868,14 @@ function renderStrengthExercisesList() {
       const idx = parseInt(chk.getAttribute('data-idx'), 10);
       if (list[idx]) {
         list[idx].done = chk.checked;
+        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
         if (chk.checked) {
-          audio.playQuestComplete();
-          state.stats.str += 1;
+          try { audio.playQuestComplete(); } catch (err) {}
+          state.stats.str = (Number(state.stats.str) || 10) + 1;
           addXp(25, `Finished ${list[idx].name} (${list[idx].sets} sets)`);
         } else {
-          audio.playClick();
-          state.stats.str = Math.max(10, state.stats.str - 1);
+          try { audio.playClick(); } catch (err) {}
+          state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
           reverseXp(25, `Finished ${list[idx].name} (${list[idx].sets} sets)`);
           showToast(`Unticked exercise: -25 XP reversed`);
         }
@@ -2053,14 +2075,16 @@ function renderPillarHunter() {
       item.addEventListener('click', () => {
         const idx = parseInt(item.getAttribute('data-dawn-idx'), 10);
         const t = dawnTasks[idx];
+        if (!t) return;
         t.done = !t.done;
+        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
         if (t.done) {
-          audio.playQuestComplete();
-          state.stats.cha += 1;
+          try { audio.playQuestComplete(); } catch (e) {}
+          state.stats.cha = (Number(state.stats.cha) || 10) + 1;
           addXp(t.xp, t.text);
         } else {
-          audio.playClick();
-          state.stats.cha = Math.max(10, state.stats.cha - 1);
+          try { audio.playClick(); } catch (e) {}
+          state.stats.cha = Math.max(10, (Number(state.stats.cha) || 10) - 1);
           reverseXp(t.xp, t.text);
           showToast(`Unticked: -${t.xp} XP reversed`);
         }
@@ -2087,14 +2111,16 @@ function renderPillarHunter() {
       item.addEventListener('click', () => {
         const idx = parseInt(item.getAttribute('data-night-idx'), 10);
         const t = nightTasks[idx];
+        if (!t) return;
         t.done = !t.done;
+        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
         if (t.done) {
-          audio.playQuestComplete();
-          state.stats.vit += 1;
+          try { audio.playQuestComplete(); } catch (e) {}
+          state.stats.vit = (Number(state.stats.vit) || 10) + 1;
           addXp(t.xp, t.text);
         } else {
-          audio.playClick();
-          state.stats.vit = Math.max(10, state.stats.vit - 1);
+          try { audio.playClick(); } catch (e) {}
+          state.stats.vit = Math.max(10, (Number(state.stats.vit) || 10) - 1);
           reverseXp(t.xp, t.text);
           showToast(`Unticked: -${t.xp} XP reversed`);
         }
@@ -2179,22 +2205,26 @@ function renderAptDrills() {
   container.querySelectorAll('.apt-drill-item').forEach(item => {
     item.addEventListener('click', (e) => {
       const idx = parseInt(item.getAttribute('data-apt-idx'), 10);
-      if (drills[idx]) {
+      if (!drills[idx]) return;
+      if (e.target.tagName !== 'INPUT') {
         drills[idx].done = !drills[idx].done;
-        if (drills[idx].done) {
-          audio.playQuestComplete();
-          state.stats.str += 1;
-          addXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
-        } else {
-          audio.playClick();
-          state.stats.str = Math.max(10, state.stats.str - 1);
-          reverseXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
-          showToast('Unticked drill: -15 XP reversed');
-        }
-        saveState(state);
-        renderAptDrills();
-        renderHud();
+      } else {
+        drills[idx].done = e.target.checked;
       }
+      if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+      if (drills[idx].done) {
+        try { audio.playQuestComplete(); } catch (err) {}
+        state.stats.str = (Number(state.stats.str) || 10) + 1;
+        addXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
+      } else {
+        try { audio.playClick(); } catch (err) {}
+        state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
+        reverseXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
+        showToast('Unticked drill: -15 XP reversed');
+      }
+      saveState(state);
+      renderAptDrills();
+      renderHud();
     });
   });
 }
@@ -2285,7 +2315,7 @@ function renderPillarAura() {
   const container = document.getElementById('aura-tasks-container');
   if (!container) return;
 
-  const tasks = state.pillarAura.auraTasks;
+  const tasks = state.pillarAura?.auraTasks || [];
   container.innerHTML = tasks.map((t, idx) => `
     <div class="quest-item ${t.done ? 'completed' : ''}" data-aura-idx="${idx}">
       <div class="quest-left">
@@ -2300,19 +2330,22 @@ function renderPillarAura() {
     item.addEventListener('click', () => {
       const idx = parseInt(item.getAttribute('data-aura-idx'), 10);
       const t = tasks[idx];
+      if (!t) return;
       t.done = !t.done;
+      if (!state.stats || typeof state.stats !== 'object') state.stats = {};
       if (t.done) {
-        audio.playQuestComplete();
-        state.stats.aura += 2;
+        try { audio.playQuestComplete(); } catch (e) {}
+        state.stats.aura = (Number(state.stats.aura) || 10) + 2;
         addXp(t.xp, t.text);
       } else {
-        audio.playClick();
-        state.stats.aura = Math.max(10, state.stats.aura - 2);
+        try { audio.playClick(); } catch (e) {}
+        state.stats.aura = Math.max(10, (Number(state.stats.aura) || 10) - 2);
         reverseXp(t.xp, t.text);
         showToast(`Unticked: -${t.xp} XP reversed`);
       }
       saveState(state);
-      renderAll();
+      renderPillarAura();
+      renderHud();
     });
   });
 
@@ -2459,19 +2492,21 @@ function renderPillarApex() {
       if (!t) return;
 
       t.done = !t.done;
+      if (!state.stats || typeof state.stats !== 'object') state.stats = {};
       if (t.done) {
-        audio.playQuestComplete();
-        state.stats.int += 1;
+        try { audio.playQuestComplete(); } catch (e) {}
+        state.stats.int = (Number(state.stats.int) || 10) + 1;
         addXp(t.xp, t.title);
         showToast(`${t.title} completed: +${t.xp} XP (+1 INT)`);
       } else {
-        audio.playClick();
-        state.stats.int = Math.max(10, state.stats.int - 1);
+        try { audio.playClick(); } catch (e) {}
+        state.stats.int = Math.max(10, (Number(state.stats.int) || 10) - 1);
         reverseXp(t.xp, t.title);
         showToast(`Unticked ${t.title}: -${t.xp} XP reversed`);
       }
       saveState(state);
-      renderAll();
+      renderPillarApex();
+      renderHud();
     });
   });
 }
@@ -3040,12 +3075,19 @@ function setupCloudSync() {
       return;
     }
     const remote = await pullStateFromCloud();
-    if (remote) {
-      state = remote;
-      saveState(state);
-      renderAll();
-      audio.playQuestComplete();
-      showToast('SUCCESS: Loaded latest data from cloud! UI refreshed.');
+    if (remote && typeof remote === 'object') {
+      const isStub = !remote.stats || typeof remote.player !== 'object' || !remote.pillarHunter;
+      if (isStub) {
+        console.warn('Cloud state was a stub or incomplete. Healing cloud with local state.');
+        await pushStateToCloud(state);
+        showToast('Remote cloud was incomplete; synchronized current state up to cloud.');
+      } else {
+        state = validateAndRepairState(remote);
+        saveState(state);
+        renderAll();
+        try { audio.playQuestComplete(); } catch (e) {}
+        showToast('SUCCESS: Loaded latest data from cloud! UI refreshed.');
+      }
     } else {
       showToast('Cloud is connected, but no remote data was found for this User ID.');
     }
@@ -3060,7 +3102,7 @@ function setupCloudSync() {
     }
     const res = await pushStateToCloud(state);
     if (res.success) {
-      audio.playQuestComplete();
+      try { audio.playQuestComplete(); } catch (e) {}
       showToast('SUCCESS: Local progress uploaded to Cloud!');
     } else {
       showToast(`Push failed: ${res.error}`);
@@ -3092,10 +3134,16 @@ function setupCloudSync() {
     setTimeout(async () => {
       try {
         const remote = await pullStateFromCloud();
-        if (remote && remote.player) {
-          state = remote;
-          saveState(state);
-          renderAll();
+        if (remote && typeof remote === 'object') {
+          const isStub = !remote.stats || typeof remote.player !== 'object' || !remote.pillarHunter;
+          if (isStub) {
+            console.warn('Initial cloud sync: remote was stub or incomplete. Uploading healthy local state to heal cloud.');
+            await pushStateToCloud(state);
+          } else {
+            state = validateAndRepairState(remote);
+            saveState(state);
+            renderAll();
+          }
         }
       } catch (e) {
         console.warn('Initial cloud sync check skipped:', e);

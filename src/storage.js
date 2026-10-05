@@ -140,192 +140,245 @@ export function getDefaultState() {
   };
 }
 
+// ==========================================================================
+// STATE VALIDATOR & REPAIR ENGINE
+// Guarantees all pillars, tasks, player, and stats exist and never corrupt
+// ==========================================================================
+export function validateAndRepairState(raw) {
+  const defaultState = getDefaultState();
+  if (!raw || typeof raw !== 'object') {
+    return defaultState;
+  }
+
+  // 1. Repair player object
+  let player = defaultState.player;
+  if (raw.player && typeof raw.player === 'object') {
+    player = {
+      ...defaultState.player,
+      ...raw.player,
+      name: typeof raw.player.name === 'string' && raw.player.name ? raw.player.name : defaultState.player.name,
+      level: Number(raw.player.level) >= 1 ? Number(raw.player.level) : 1,
+      xp: Number(raw.player.xp) >= 0 ? Number(raw.player.xp) : 0,
+      xpRequired: Number(raw.player.xpRequired) > 0 ? Number(raw.player.xpRequired) : 100,
+      gold: Number(raw.player.gold) >= 0 ? Number(raw.player.gold) : 0,
+      unallocatedStatPoints: Number(raw.player.unallocatedStatPoints) || 0,
+      hp: Number(raw.player.hp) || 100,
+      maxHp: Number(raw.player.maxHp) || 100,
+      mp: Number(raw.player.mp) || 100,
+      maxMp: Number(raw.player.maxMp) || 100
+    };
+  }
+  const rankInfo = calculateRank(player.level);
+  player.rank = rankInfo.rank;
+  player.title = rankInfo.title;
+
+  // 2. Repair stats object
+  let stats = defaultState.stats;
+  if (raw.stats && typeof raw.stats === 'object') {
+    stats = {
+      pur: Number(raw.stats.pur) >= 1 ? Number(raw.stats.pur) : 10,
+      vit: Number(raw.stats.vit) >= 1 ? Number(raw.stats.vit) : 10,
+      str: Number(raw.stats.str) >= 1 ? Number(raw.stats.str) : 10,
+      cha: Number(raw.stats.cha) >= 1 ? Number(raw.stats.cha) : 10,
+      aura: Number(raw.stats.aura) >= 1 ? Number(raw.stats.aura) : 10,
+      int: Number(raw.stats.int) >= 1 ? Number(raw.stats.int) : 10
+    };
+  }
+
+  // 3. Repair pillarHunter
+  let pillarHunter = defaultState.pillarHunter;
+  if (raw.pillarHunter && typeof raw.pillarHunter === 'object') {
+    const rawDawn = Array.isArray(raw.pillarHunter.dawnTasks) ? raw.pillarHunter.dawnTasks : [];
+    const dawnTasks = defaultState.pillarHunter.dawnTasks.map(defTask => {
+      const match = rawDawn.find(t => t && t.id === defTask.id);
+      return match ? { ...defTask, done: Boolean(match.done) } : { ...defTask };
+    });
+
+    const rawNight = Array.isArray(raw.pillarHunter.nightTasks) ? raw.pillarHunter.nightTasks : [];
+    const nightTasks = defaultState.pillarHunter.nightTasks.map(defTask => {
+      const match = rawNight.find(t => t && t.id === defTask.id);
+      return match ? { ...defTask, done: Boolean(match.done) } : { ...defTask };
+    });
+
+    const rawApt = Array.isArray(raw.pillarHunter.aptChecklist) ? raw.pillarHunter.aptChecklist : [];
+    const aptChecklist = defaultState.pillarHunter.aptChecklist.map(defDrill => {
+      const match = rawApt.find(d => d && d.id === defDrill.id);
+      return match ? { ...defDrill, done: Boolean(match.done) } : { ...defDrill };
+    });
+
+    pillarHunter = {
+      ...defaultState.pillarHunter,
+      ...raw.pillarHunter,
+      dawnTasks,
+      nightTasks,
+      aptChecklist,
+      proteinGrams: Number(raw.pillarHunter.proteinGrams) >= 0 ? Number(raw.pillarHunter.proteinGrams) : 0,
+      proteinTarget: Number(raw.pillarHunter.proteinTarget) || 120,
+      antiJunkClaimed: Boolean(raw.pillarHunter.antiJunkClaimed),
+      skinGlow: Number(raw.pillarHunter.skinGlow) || 0
+    };
+  }
+
+  // 4. Repair pillarAura
+  let pillarAura = defaultState.pillarAura;
+  if (raw.pillarAura && typeof raw.pillarAura === 'object') {
+    const rawAura = Array.isArray(raw.pillarAura.auraTasks) ? raw.pillarAura.auraTasks : [];
+    const auraTasks = defaultState.pillarAura.auraTasks.map(defTask => {
+      const match = rawAura.find(t => t && t.id === defTask.id);
+      return match ? { ...defTask, done: Boolean(match.done) } : { ...defTask };
+    });
+
+    pillarAura = {
+      ...defaultState.pillarAura,
+      ...raw.pillarAura,
+      auraTasks,
+      gratitudeEntries: Array.isArray(raw.pillarAura.gratitudeEntries) ? raw.pillarAura.gratitudeEntries : ["", "", ""],
+      dailyMoodScore: Number(raw.pillarAura.dailyMoodScore) || 8
+    };
+  }
+
+  // 5. Repair pillarApex
+  let pillarApex = defaultState.pillarApex;
+  if (raw.pillarApex && typeof raw.pillarApex === 'object') {
+    const rawTracks = Array.isArray(raw.pillarApex.tracks) ? raw.pillarApex.tracks : [];
+    const tracks = defaultState.pillarApex.tracks.map(defTrack => {
+      const match = rawTracks.find(t => t && t.id === defTrack.id);
+      return match ? { ...defTrack, done: Boolean(match.done) } : { ...defTrack };
+    });
+    pillarApex = {
+      ...defaultState.pillarApex,
+      ...raw.pillarApex,
+      tracks
+    };
+  }
+
+  // 6. Repair pillarForge
+  let pillarForge = defaultState.pillarForge;
+  if (raw.pillarForge && typeof raw.pillarForge === 'object') {
+    pillarForge = {
+      ...defaultState.pillarForge,
+      ...raw.pillarForge,
+      workoutsDone: Number(raw.pillarForge.workoutsDone) || 0,
+      currentStreak: Number(raw.pillarForge.currentStreak) || 0,
+      weeklySchedule: raw.pillarForge.weeklySchedule && typeof raw.pillarForge.weeklySchedule === 'object'
+        ? { ...defaultState.pillarForge.weeklySchedule, ...raw.pillarForge.weeklySchedule }
+        : defaultState.pillarForge.weeklySchedule,
+      strengthExercises: Array.isArray(raw.pillarForge.strengthExercises)
+        ? raw.pillarForge.strengthExercises
+        : defaultState.pillarForge.strengthExercises
+    };
+  }
+
+  // 7. Repair pillarPurity & pillarEngine
+  let pillarPurity = defaultState.pillarPurity;
+  if (raw.pillarPurity && typeof raw.pillarPurity === 'object') {
+    pillarPurity = {
+      ...defaultState.pillarPurity,
+      ...raw.pillarPurity,
+      streakDays: Number(raw.pillarPurity.streakDays) || 0
+    };
+  }
+
+  let pillarEngine = defaultState.pillarEngine;
+  if (raw.pillarEngine && typeof raw.pillarEngine === 'object') {
+    pillarEngine = {
+      ...defaultState.pillarEngine,
+      ...raw.pillarEngine,
+      cigsAvoidedCount: Number(raw.pillarEngine.cigsAvoidedCount) || 0,
+      moneySaved: Number(raw.pillarEngine.moneySaved) || 0,
+      cravingSurfedCount: Number(raw.pillarEngine.cravingSurfedCount) || 0
+    };
+  }
+
+  // 8. Timestamps & Settings
+  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  if (pillarEngine.smokeFreeStartTimestamp > campaignStart || !pillarEngine.smokeFreeStartTimestamp) {
+    pillarEngine.smokeFreeStartTimestamp = campaignStart;
+  }
+  if (!pillarPurity.lastRelapseTimestamp || pillarPurity.lastRelapseTimestamp > campaignStart) {
+    pillarPurity.lastRelapseTimestamp = campaignStart;
+  }
+
+  return {
+    ...defaultState,
+    ...raw,
+    player,
+    stats,
+    pillarHunter,
+    pillarAura,
+    pillarApex,
+    pillarForge,
+    pillarPurity,
+    pillarEngine,
+    frozenDates: raw.frozenDates && typeof raw.frozenDates === 'object' ? raw.frozenDates : {},
+    extendedDaysCount: raw.frozenDates ? Object.keys(raw.frozenDates).length : 0,
+    dailyChecklist: Array.isArray(raw.dailyChecklist) ? raw.dailyChecklist : defaultState.dailyChecklist,
+    rewardsShop: Array.isArray(raw.rewardsShop) ? raw.rewardsShop : defaultState.rewardsShop,
+    diaryEntries: Array.isArray(raw.diaryEntries) ? raw.diaryEntries : [],
+    dailyHistory: raw.dailyHistory && typeof raw.dailyHistory === 'object' ? raw.dailyHistory : {},
+    lastResetDate: raw.lastResetDate || new Date().toDateString()
+  };
+}
+
 export function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return getDefaultState();
     const parsed = JSON.parse(raw);
-    const defaultState = getDefaultState();
+    let state = validateAndRepairState(parsed);
 
     const today = new Date().toDateString();
-    if (parsed.lastResetDate !== today) {
-      if (!parsed.dailyHistory) parsed.dailyHistory = {};
-      parsed.dailyHistory[parsed.lastResetDate] = {
-        date: parsed.lastResetDate,
-        purityStreak: parsed.pillarPurity?.streakDays || 0,
-        cigsAvoided: parsed.pillarEngine?.cigsAvoidedCount || 0,
-        workoutsDone: parsed.pillarForge?.workoutsDone || 0,
-        completedQuests: (parsed.dailyChecklist || []).filter(q => q.done).map(q => q.title),
-        savedCash: parsed.pillarEngine?.moneySaved || 0,
-        proteinGrams: parsed.pillarHunter?.proteinGrams || 0,
-        careerTracksDone: (parsed.pillarApex?.tracks || []).filter(t => t.done).map(t => t.title),
-        dailyMoodScore: parsed.pillarAura?.dailyMoodScore || 8,
-        antiJunkClaimed: parsed.pillarHunter?.antiJunkClaimed || false,
-        gratitudeSealed: Boolean(parsed.pillarAura?.gratitudeSealedDate)
+    if (state.lastResetDate !== today) {
+      if (!state.dailyHistory) state.dailyHistory = {};
+      state.dailyHistory[state.lastResetDate] = {
+        date: state.lastResetDate,
+        purityStreak: state.pillarPurity?.streakDays || 0,
+        cigsAvoided: state.pillarEngine?.cigsAvoidedCount || 0,
+        workoutsDone: state.pillarForge?.workoutsDone || 0,
+        completedQuests: (state.dailyChecklist || []).filter(q => q.done).map(q => q.title),
+        savedCash: state.pillarEngine?.moneySaved || 0,
+        proteinGrams: state.pillarHunter?.proteinGrams || 0,
+        careerTracksDone: (state.pillarApex?.tracks || []).filter(t => t.done).map(t => t.title),
+        dailyMoodScore: state.pillarAura?.dailyMoodScore || 8,
+        antiJunkClaimed: state.pillarHunter?.antiJunkClaimed || false,
+        gratitudeSealed: Boolean(state.pillarAura?.gratitudeSealedDate)
       };
 
-      parsed.lastResetDate = today;
-      if (parsed.dailyChecklist) {
-        parsed.dailyChecklist.forEach(q => q.done = false);
+      state.lastResetDate = today;
+      if (state.dailyChecklist) {
+        state.dailyChecklist.forEach(q => q.done = false);
       }
-      if (parsed.pillarHunter) {
-        parsed.pillarHunter.dawnTasks.forEach(t => t.done = false);
-        parsed.pillarHunter.nightTasks.forEach(t => t.done = false);
-        parsed.pillarHunter.antiJunkClaimed = false;
-        parsed.pillarHunter.proteinGrams = 0;
+      if (state.pillarHunter) {
+        state.pillarHunter.dawnTasks.forEach(t => t.done = false);
+        state.pillarHunter.nightTasks.forEach(t => t.done = false);
+        state.pillarHunter.antiJunkClaimed = false;
+        state.pillarHunter.proteinGrams = 0;
       }
-      if (parsed.pillarAura) {
-        parsed.pillarAura.auraTasks.forEach(t => t.done = false);
+      if (state.pillarAura) {
+        state.pillarAura.auraTasks.forEach(t => t.done = false);
       }
-      if (parsed.pillarApex && parsed.pillarApex.tracks) {
-        parsed.pillarApex.tracks.forEach(t => t.done = false);
-      }
-    }
-
-    if (!parsed.frozenDates) parsed.frozenDates = {};
-    parsed.extendedDaysCount = Object.keys(parsed.frozenDates).length;
-
-    // Reset baseline to 0 for official launch starting Oct 5, 2026
-    if (!parsed.officialOct5BlankSlateApplied) {
-      parsed.officialOct5BlankSlateApplied = true;
-      parsed.statsResetForOct5Launch = true;
-      parsed.dailyHistory = {};
-      parsed.diaryEntries = [];
-      if (parsed.player) {
-        parsed.player.xp = 0;
-        parsed.player.gold = 0;
-        parsed.player.level = 1;
-        parsed.player.xpRequired = 100;
-      }
-      if (parsed.pillarPurity) {
-        parsed.pillarPurity.streakDays = 0;
-        parsed.pillarPurity.breachHistory = [];
-      }
-      if (parsed.pillarEngine) {
-        parsed.pillarEngine.cigsAvoidedCount = 0;
-        parsed.pillarEngine.moneySaved = 0;
-        parsed.pillarEngine.cravingSurfedCount = 0;
-        parsed.pillarEngine.smokeFreeStartTimestamp = Date.now();
-      }
-      if (parsed.pillarForge) {
-        parsed.pillarForge.workoutsDone = 0;
-        parsed.pillarForge.currentStreak = 0;
-        if (parsed.pillarForge.weeklySchedule) {
-          Object.values(parsed.pillarForge.weeklySchedule).forEach(s => s.done = false);
-        }
-        if (parsed.pillarForge.strengthExercises) {
-          parsed.pillarForge.strengthExercises.forEach(e => e.done = false);
-        }
-      }
-      if (parsed.pillarHunter) {
-        parsed.pillarHunter.proteinGrams = 0;
-        parsed.pillarHunter.skinGlow = 0;
-        parsed.pillarHunter.antiJunkClaimed = false;
-        if (parsed.pillarHunter.dawnTasks) parsed.pillarHunter.dawnTasks.forEach(t => t.done = false);
-        if (parsed.pillarHunter.nightTasks) parsed.pillarHunter.nightTasks.forEach(t => t.done = false);
-      }
-      if (parsed.pillarApex) {
-        parsed.pillarApex.applicationsSent = 0;
-        parsed.pillarApex.analyticsLeadersReached = 0;
-        parsed.pillarApex.bossHp = 100;
-        if (parsed.pillarApex.tracks) parsed.pillarApex.tracks.forEach(t => t.done = false);
-      }
-      if (parsed.pillarAura) {
-        if (parsed.pillarAura.auraTasks) parsed.pillarAura.auraTasks.forEach(t => t.done = false);
-        parsed.pillarAura.dailyMoodScore = 0;
-        parsed.pillarAura.gratitudeEntries = ["", "", ""];
-        parsed.pillarAura.gratitudeSealedDate = null;
-      }
-      if (parsed.dailyChecklist) {
-        parsed.dailyChecklist.forEach(q => q.done = false);
-      }
-      saveState(parsed);
-    }
-
-    if (parsed.settings) {
-      if (parsed.settings.cigsPerDay === 8 || !parsed.settings.cigsPerDay) parsed.settings.cigsPerDay = 2;
-      if (!parsed.settings.costPerCig) parsed.settings.costPerCig = 25;
-      delete parsed.settings.packCost;
-      delete parsed.settings.spaCost;
-    }
-
-    if (parsed.pillarForge) {
-      if (!parsed.pillarForge.weeklySchedule) {
-        parsed.pillarForge.weeklySchedule = defaultState.pillarForge.weeklySchedule;
-      }
-      if (!parsed.pillarForge.strengthExercises) {
-        parsed.pillarForge.strengthExercises = defaultState.pillarForge.strengthExercises;
+      if (state.pillarApex && state.pillarApex.tracks) {
+        state.pillarApex.tracks.forEach(t => t.done = false);
       }
     }
 
-    if (parsed.pillarHunter) {
-      const defaultDawn = defaultState.pillarHunter.dawnTasks;
-      if (!parsed.pillarHunter.dawnTasks || parsed.pillarHunter.dawnTasks.length !== defaultDawn.length || !parsed.pillarHunter.dawnTasks.some(t => t.id === 'wake_5am')) {
-        parsed.pillarHunter.dawnTasks = defaultDawn;
-      }
-      const defaultNight = defaultState.pillarHunter.nightTasks;
-      if (!parsed.pillarHunter.nightTasks || !parsed.pillarHunter.nightTasks.some(t => t.id === 'sleep_8h')) {
-        parsed.pillarHunter.nightTasks = defaultNight;
-      }
-      if (parsed.pillarHunter.proteinGrams === undefined) {
-        parsed.pillarHunter.proteinGrams = 0;
-      }
-      if (!parsed.pillarHunter.proteinTarget) {
-        parsed.pillarHunter.proteinTarget = 120;
-      }
-      if (!parsed.pillarHunter.aptChecklist) {
-        parsed.pillarHunter.aptChecklist = defaultState.pillarHunter.aptChecklist;
-      }
-    }
-
-    if (parsed.pillarAura) {
-      const defaultAura = defaultState.pillarAura.auraTasks;
-      if (!parsed.pillarAura.auraTasks || parsed.pillarAura.auraTasks.length !== defaultAura.length || !parsed.pillarAura.auraTasks.some(t => t.id === 'slow_movements')) {
-        parsed.pillarAura.auraTasks = defaultAura;
-      }
-      if (!parsed.pillarAura.gratitudeEntries) {
-        parsed.pillarAura.gratitudeEntries = ["", "", ""];
-      }
-      if (typeof parsed.pillarAura.dailyMoodScore === 'undefined') {
-        parsed.pillarAura.dailyMoodScore = 8;
-      }
-    }
-
-    if (!parsed.pillarApex || !Array.isArray(parsed.pillarApex.tracks) || parsed.pillarApex.tracks.length !== 5) {
-      if (!parsed.pillarApex) parsed.pillarApex = {};
-      parsed.pillarApex.tracks = defaultState.pillarApex.tracks;
-    }
-
-    if (parsed.player) {
-      parsed.player.name = "Suhas S";
-      const rankInfo = calculateRank(parsed.player.level || 1);
-      parsed.player.rank = rankInfo.rank;
-      parsed.player.title = rankInfo.title;
-    }
-
-    // Anchor smoke-free and purity timestamps to campaign launch (Oct 5, 2026, 00:00:00)
-    // so continuous clean time is measured accurately from midnight when the game officially started
-    const campaignStart = new Date('2026-10-05T00:00:00').getTime();
-    if (Date.now() >= campaignStart) {
-      if (parsed.pillarEngine && (!parsed.pillarEngine.smokeFreeStartTimestamp || parsed.pillarEngine.smokeFreeStartTimestamp > campaignStart)) {
-        parsed.pillarEngine.smokeFreeStartTimestamp = campaignStart;
-      }
-      if (parsed.pillarPurity && (!parsed.pillarPurity.lastRelapseTimestamp || (parsed.pillarPurity.lastRelapseTimestamp > campaignStart && (!parsed.pillarPurity.breachHistory || parsed.pillarPurity.breachHistory.length === 0)))) {
-        parsed.pillarPurity.lastRelapseTimestamp = campaignStart;
-      }
-    }
-
-    return { ...defaultState, ...parsed };
+    state = validateAndRepairState(state);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return state;
   } catch (e) {
     console.error('Failed to load state from localStorage:', e);
-    return getDefaultState();
+    const fallback = getDefaultState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
+    return fallback;
   }
 }
 
 export function saveState(state) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    queueCloudSync(state);
+    const cleanState = validateAndRepairState(state);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanState));
+    queueCloudSync(cleanState);
+    return cleanState;
   } catch (e) {
     console.error('Failed to save state to localStorage:', e);
   }
