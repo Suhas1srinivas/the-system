@@ -4,6 +4,8 @@
 // ==========================================================
 
 const SYNC_CONFIG_KEY = 'the_system_cloud_config';
+const DEFAULT_SUPABASE_URL = 'https://wyakeheyrhurytbfaacp.supabase.co';
+const DEFAULT_SUPABASE_KEY = 'sb_publishable_cxwIApxkNxjRxJHd_yu0OA_ErlfrEmJ';
 let debounceTimer = null;
 let syncStatusListeners = [];
 
@@ -13,8 +15,8 @@ export function getCloudConfig() {
     const parsed = raw ? JSON.parse(raw) : {};
     return {
       provider: parsed.provider || 'supabase', // 'supabase' or 'firebase'
-      supabaseUrl: parsed.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || '',
-      supabaseAnonKey: parsed.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+      supabaseUrl: parsed.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL,
+      supabaseAnonKey: parsed.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_KEY,
       firebaseProjectId: parsed.firebaseProjectId || import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
       firebaseApiKey: parsed.firebaseApiKey || import.meta.env.VITE_FIREBASE_API_KEY || '',
       syncUserId: parsed.syncUserId || 'suhas_s',
@@ -24,8 +26,8 @@ export function getCloudConfig() {
   } catch (e) {
     return {
       provider: 'supabase',
-      supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
-      supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+      supabaseUrl: DEFAULT_SUPABASE_URL,
+      supabaseAnonKey: DEFAULT_SUPABASE_KEY,
       firebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
       firebaseApiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
       syncUserId: 'suhas_s',
