@@ -386,10 +386,10 @@
         <path d="M1062 492 L1044 522" stroke="#9cbcec" stroke-width="6" opacity=".22" filter="url(#b2)"/>
         <path d="M858 492 L876 522" stroke="#9cbcec" stroke-width="6" opacity=".22" filter="url(#b2)"/>
         <path d="M884 500 C905 532 930 552 960 557 C990 552 1015 532 1036 500" stroke="#9cbcec" stroke-width="6" fill="none" opacity=".16" filter="url(#b6)"/>
-        <!-- eye glow spilling onto brow underside and cheeks -->
+        <!-- eye glow localized reflection near sockets -->
         <g style="mix-blend-mode:screen" class="eye-pulse">
-          <ellipse cx="918" cy="404" rx="56" ry="30" fill="url(#eyeG)" opacity=".32"/>
-          <ellipse cx="1002" cy="404" rx="56" ry="30" fill="url(#eyeG)" opacity=".32"/>
+          <ellipse cx="918" cy="402" rx="30" ry="14" fill="#38bdf8" opacity=".2"/>
+          <ellipse cx="1002" cy="402" rx="30" ry="14" fill="#38bdf8" opacity=".2"/>
         </g>
 
         <!-- ===== rim light wrapping inside the edge (not an outline) ===== -->
@@ -550,38 +550,35 @@
       <!-- soft top sheen across the hair crown -->
       <ellipse cx="960" cy="232" rx="110" ry="22" fill="#7ea4dc" opacity=".22" filter="url(#b14)"/>
 
-      <!-- THE SILENT SOVEREIGN MONARCH EYES -->
-      <!-- Wide anamorphic flare beam across screen -->
-      <g filter="url(#bloom)">
-        <ellipse cx="960" cy="404" rx="460" ry="4.5" fill="#00f0ff" opacity=".95"/>
-        <ellipse cx="960" cy="404" rx="240" ry="2.2" fill="#ffffff" opacity="1"/>
-      </g>
+      <!-- THE SILENT SOVEREIGN SUPERNATURAL EYES -->
+      <!-- Left and Right eyes are two distinct, horizontally shaped glowing eyes with bright white centers and soft blue-white glow tightly localized around each eye -->
+      <g class="eyes">
+        <!-- Soft localized blue-white outer glow -->
+        <g class="eye-pulse" filter="url(#bloom)" opacity="0.9">
+          <ellipse cx="918" cy="402" rx="36" ry="16" fill="#38bdf8" opacity="0.75" filter="url(#b6)"/>
+          <ellipse cx="1002" cy="402" rx="36" ry="16" fill="#38bdf8" opacity="0.75" filter="url(#b6)"/>
+          <ellipse cx="918" cy="402" rx="28" ry="12" fill="#7dd3fc" opacity="0.85" filter="url(#b2)"/>
+          <ellipse cx="1002" cy="402" rx="28" ry="12" fill="#7dd3fc" opacity="0.85" filter="url(#b2)"/>
+        </g>
 
-      <!-- Eye bloom aura -->
-      <g class="eye-pulse" filter="url(#bloom)">
-        <ellipse cx="918" cy="404" rx="85" ry="34" fill="#00f0ff" opacity=".88" filter="url(#b14)"/>
-        <ellipse cx="1002" cy="404" rx="85" ry="34" fill="#00f0ff" opacity=".88" filter="url(#b14)"/>
-        <ellipse cx="918" cy="404" rx="58" ry="24" fill="url(#eyeG)" opacity="1"/>
-        <ellipse cx="1002" cy="404" rx="58" ry="24" fill="url(#eyeG)" opacity="1"/>
-      </g>
+        <!-- Subtle horizontal oval/almond shape contour -->
+        <g filter="url(#bloom)">
+          <!-- Left Eye Almond Shape -->
+          <path d="M894 402 C901 391 935 391 942 402 C935 413 901 413 894 402 Z" fill="#bae6fd"/>
+          <!-- Right Eye Almond Shape -->
+          <path d="M978 402 C985 391 1019 391 1026 402 C1019 413 985 413 978 402 Z" fill="#bae6fd"/>
+        </g>
 
-      <!-- Sharp sovereign eye slit & diamond irises -->
-      <g class="eyes" filter="url(#bloom)">
-        <path d="M885 406 Q918 390 952 402 Q918 418 885 406 Z" fill="#00f0ff"/>
-        <path d="M892 406 Q918 394 945 403 Q918 414 892 406 Z" fill="#ffffff"/>
-        <polygon points="918,393 928,404 918,415 908,404" fill="#ffffff"/>
+        <!-- Intense pure white glowing centers staring directly forward -->
+        <g>
+          <!-- Left Eye White Center -->
+          <path d="M898 402 C904 394 932 394 938 402 C932 410 904 410 898 402 Z" fill="#ffffff"/>
+          <ellipse cx="918" cy="402" rx="16" ry="5.5" fill="#ffffff" filter="url(#b2)"/>
 
-        <path d="M1035 406 Q1002 390 968 402 Q1002 418 1035 406 Z" fill="#00f0ff"/>
-        <path d="M1028 406 Q1002 394 975 403 Q1002 414 1028 406 Z" fill="#ffffff"/>
-        <polygon points="1002,393 1012,404 1002,415 992,404" fill="#ffffff"/>
-      </g>
-
-      <!-- Dynamic eye energy flames rising -->
-      <g stroke="#00f0ff" stroke-width="2.5" fill="none" opacity=".85" filter="url(#bloom)">
-        <path d="M890 404 Q872 375 868 345 Q864 320 872 295"/>
-        <path d="M945 402 Q958 375 952 345"/>
-        <path d="M1030 404 Q1048 375 1052 345 Q1056 320 1048 295"/>
-        <path d="M975 402 Q962 375 968 345"/>
+          <!-- Right Eye White Center -->
+          <path d="M982 402 C988 394 1016 394 1022 402 C1016 410 988 410 982 402 Z" fill="#ffffff"/>
+          <ellipse cx="1002" cy="402" rx="16" ry="5.5" fill="#ffffff" filter="url(#b2)"/>
+        </g>
       </g>
     </g>
 
