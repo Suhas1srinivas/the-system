@@ -8,6 +8,7 @@ export function renderRadarChart(canvasId, stats) {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || 340;
   const height = canvas.clientHeight || 300;

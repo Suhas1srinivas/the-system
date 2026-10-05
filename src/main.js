@@ -13,7 +13,7 @@ import {
   renderCampaignHeatmap
 } from './charts.js';
 import { renderRadarChart } from './radar.js';
-import { loadState, saveState, calculateRank, getHistoricalTimeline, validateAndRepairState } from './storage.js';
+import { loadState, saveState, calculateRank, getHistoricalTimeline, reconcileState } from './storage.js';
 import { 
   getCloudConfig, 
   saveCloudConfig, 
@@ -25,6 +25,46 @@ import {
 } from './sync.js';
 
 let state = loadState();
+
+export function showToast(message, type = 'info', duration = 3200) {
+  try {
+    let container = document.getElementById('system-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'system-toast-container';
+      container.className = 'system-toast-container';
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `system-toast toast-${type}`;
+    const icon = type === 'error' ? '⚠' : (message.includes('Unticked') || message.includes('reversed') || message.includes('Reversed')) ? '↺' : '⚡';
+    const safeMsg = (typeof message === 'string') 
+      ? message.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]) 
+      : String(message);
+
+    toast.innerHTML = `
+      <span class="toast-icon">${icon}</span>
+      <span class="toast-msg">${safeMsg}</span>
+    `;
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+      toast.classList.add('visible');
+    });
+
+    setTimeout(() => {
+      toast.classList.remove('visible');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, duration);
+  } catch (e) {
+    console.log('Toast:', message);
+  }
+}
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -92,23 +132,40 @@ function setupLiveDates() {
 // RENDER & UI SYNC
 // ==========================================================================
 function renderAll() {
-  renderHud();
-  updateFreezeStatusAndBanner();
-  renderDashboardAnalytics();
-  renderDiary();
-  renderPillarPurity();
-  renderPillarEngine();
-  renderPillarForge();
-  renderPillarHunter();
-  renderPillarAura();
-  renderPillarApex();
-  renderQuestLog();
-  renderShop();
+  try { renderHud(); } catch (e) { console.error('HUD render error:', e); }
+  try { updateFreezeStatusAndBanner(); } catch (e) { console.error('Freeze banner error:', e); }
+  try { renderDashboardAnalytics(); } catch (e) { console.error('Analytics render error:', e); }
+  try { renderDiary(); } catch (e) { console.error('Diary render error:', e); }
+  try { renderPillarPurity(); } catch (e) { console.error('Purity render error:', e); }
+  try { renderPillarEngine(); } catch (e) { console.error('Engine render error:', e); }
+  try { renderPillarForge(); } catch (e) { console.error('Forge render error:', e); }
+  try { renderPillarHunter(); } catch (e) { console.error('Hunter render error:', e); }
+  try { renderPillarAura(); } catch (e) { console.error('Aura render error:', e); }
+  try { renderPillarApex(); } catch (e) { console.error('Apex render error:', e); }
+  try { renderQuestLog(); } catch (e) { console.error('QuestLog render error:', e); }
+  try { renderShop(); } catch (e) { console.error('Shop render error:', e); }
 }
 
 function renderHud() {
+  if (!state.player || typeof state.player !== 'object') {
+    state.player = {
+      name: "Suhas S",
+      rank: "E",
+      level: 1,
+      xp: 0,
+      xpRequired: 100,
+      gold: 0,
+      unallocatedStatPoints: 0,
+      title: "Rank E",
+      class: "Data Scientist & Strategist",
+      hp: 100,
+      maxHp: 100,
+      mp: 100,
+      maxMp: 100
+    };
+  }
   const { player } = state;
-  const rankInfo = calculateRank(player.level);
+  const rankInfo = calculateRank(player.level || 1);
   player.rank = rankInfo.rank;
   player.title = rankInfo.title;
 
@@ -801,69 +858,130 @@ export function getXpRequiredForLevel(level) {
 }
 
 export function addXp(amount, sourceTitle = '') {
-  if (!state || !state.player || typeof state.player !== 'object') {
-    state = validateAndRepairState(state);
+  if (!state.player || typeof state.player !== 'object') {
+    state.player = {
+      name: "Suhas S",
+      rank: "E",
+      level: 1,
+      xp: 0,
+      xpRequired: 100,
+      gold: 0,
+      unallocatedStatPoints: 0,
+      title: "Rank E",
+      class: "Data Scientist & Strategist",
+      hp: 100,
+      maxHp: 100,
+      mp: 100,
+      maxMp: 100
+    };
   }
-  amount = Math.max(0, parseInt(amount, 10) || 0);
-  state.player.xp = (Number(state.player.xp) || 0) + amount;
-  
+  if (typeof state.player.xp !== 'number' || isNaN(state.player.xp)) state.player.xp = 0;
+  if (typeof state.player.level !== 'number' || isNaN(state.player.level) || state.player.level < 1) state.player.level = 1;
+  if (typeof state.player.xpRequired !== 'number' || isNaN(state.player.xpRequired) || state.player.xpRequired <= 0) {
+    state.player.xpRequired = getXpRequiredForLevel(state.player.level);
+  }
+  if (typeof state.player.gold !== 'number' || isNaN(state.player.gold)) state.player.gold = 0;
+  if (typeof state.player.unallocatedStatPoints !== 'number' || isNaN(state.player.unallocatedStatPoints)) state.player.unallocatedStatPoints = 0;
+
+  if (!state.stats || typeof state.stats !== 'object') {
+    state.stats = { pur: 10, vit: 10, str: 10, cha: 10, aura: 10, int: 10 };
+  } else {
+    ['pur', 'vit', 'str', 'cha', 'aura', 'int'].forEach(s => {
+      if (typeof state.stats[s] !== 'number' || isNaN(state.stats[s])) state.stats[s] = 10;
+    });
+  }
+
+  const validAmount = parseInt(amount, 10) || 0;
+  state.player.xp += validAmount;
   try {
     audio.playChime();
-  } catch (e) {
-    // AudioContext might be waiting for user gesture
-  }
+  } catch (e) {}
+
+  let leveledUp = false;
+  const startLevel = state.player.level;
 
   while (state.player.xp >= state.player.xpRequired) {
     state.player.xp -= state.player.xpRequired;
-    state.player.level = (Number(state.player.level) || 1) + 1;
+    state.player.level += 1;
     state.player.xpRequired = getXpRequiredForLevel(state.player.level);
-    state.player.gold = (Number(state.player.gold) || 0) + 100;
-    state.player.unallocatedStatPoints = (Number(state.player.unallocatedStatPoints) || 0) + 3;
-    state.player.hp = state.player.maxHp;
-    state.player.mp = state.player.maxMp;
+    state.player.gold += 100;
+    state.player.unallocatedStatPoints += 3;
+    state.player.hp = state.player.maxHp || 100;
+    state.player.mp = state.player.maxMp || 100;
 
-    // Distribute stats safely
-    if (!state.stats || typeof state.stats !== 'object') state.stats = {};
-    state.stats.pur = (Number(state.stats.pur) || 10) + 1;
-    state.stats.vit = (Number(state.stats.vit) || 10) + 1;
-    state.stats.str = (Number(state.stats.str) || 10) + 1;
-    state.stats.cha = (Number(state.stats.cha) || 10) + 1;
-    state.stats.aura = (Number(state.stats.aura) || 10) + 1;
-    state.stats.int = (Number(state.stats.int) || 10) + 1;
+    // Distribute stats
+    state.stats.pur += 1;
+    state.stats.vit += 1;
+    state.stats.str += 1;
+    state.stats.cha += 1;
+    state.stats.aura += 1;
+    state.stats.int += 1;
 
     const rankInfo = calculateRank(state.player.level);
     state.player.rank = rankInfo.rank;
     state.player.title = rankInfo.title;
 
-    triggerLevelUpModal(state.player.level - 1, state.player.level);
+    leveledUp = true;
+  }
+
+  if (leveledUp) {
+    triggerLevelUpModal(startLevel, state.player.level);
   }
 
   saveState(state);
-  renderHud();
-  renderDashboardAnalytics();
+  renderAll();
 }
 
 export function reverseXp(amount, sourceTitle = '') {
-  if (!state || !state.player || typeof state.player !== 'object') {
-    state = validateAndRepairState(state);
+  if (!state.player || typeof state.player !== 'object') {
+    state.player = {
+      name: "Suhas S",
+      rank: "E",
+      level: 1,
+      xp: 0,
+      xpRequired: 100,
+      gold: 0,
+      unallocatedStatPoints: 0,
+      title: "Rank E",
+      class: "Data Scientist & Strategist",
+      hp: 100,
+      maxHp: 100,
+      mp: 100,
+      maxMp: 100
+    };
   }
-  amount = Math.max(0, parseInt(amount, 10) || 0);
-  state.player.xp = (Number(state.player.xp) || 0) - amount;
+  if (typeof state.player.xp !== 'number' || isNaN(state.player.xp)) state.player.xp = 0;
+  if (typeof state.player.level !== 'number' || isNaN(state.player.level) || state.player.level < 1) state.player.level = 1;
+  if (typeof state.player.xpRequired !== 'number' || isNaN(state.player.xpRequired) || state.player.xpRequired <= 0) {
+    state.player.xpRequired = getXpRequiredForLevel(state.player.level);
+  }
+  if (typeof state.player.gold !== 'number' || isNaN(state.player.gold)) state.player.gold = 0;
+  if (typeof state.player.unallocatedStatPoints !== 'number' || isNaN(state.player.unallocatedStatPoints)) state.player.unallocatedStatPoints = 0;
+
+  if (!state.stats || typeof state.stats !== 'object') {
+    state.stats = { pur: 10, vit: 10, str: 10, cha: 10, aura: 10, int: 10 };
+  } else {
+    ['pur', 'vit', 'str', 'cha', 'aura', 'int'].forEach(s => {
+      if (typeof state.stats[s] !== 'number' || isNaN(state.stats[s])) state.stats[s] = 10;
+    });
+  }
+
+  const validAmount = parseInt(amount, 10) || 0;
+  state.player.xp -= validAmount;
 
   while (state.player.xp < 0 && state.player.level > 1) {
     state.player.level -= 1;
     state.player.xpRequired = getXpRequiredForLevel(state.player.level);
     state.player.xp += state.player.xpRequired;
-    state.player.gold = Math.max(0, (Number(state.player.gold) || 0) - 100);
-    state.player.unallocatedStatPoints = Math.max(0, (Number(state.player.unallocatedStatPoints) || 0) - 3);
+    state.player.gold = Math.max(0, state.player.gold - 100);
+    state.player.unallocatedStatPoints = Math.max(0, state.player.unallocatedStatPoints - 3);
 
-    if (!state.stats || typeof state.stats !== 'object') state.stats = {};
-    state.stats.pur = Math.max(10, (Number(state.stats.pur) || 10) - 1);
-    state.stats.vit = Math.max(10, (Number(state.stats.vit) || 10) - 1);
-    state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
-    state.stats.cha = Math.max(10, (Number(state.stats.cha) || 10) - 1);
-    state.stats.aura = Math.max(10, (Number(state.stats.aura) || 10) - 1);
-    state.stats.int = Math.max(10, (Number(state.stats.int) || 10) - 1);
+    state.stats.pur = Math.max(10, state.stats.pur - 1);
+    state.stats.vit = Math.max(10, state.stats.vit - 1);
+    state.stats.str = Math.max(10, state.stats.str - 1);
+    state.stats.cha = Math.max(10, state.stats.cha - 1);
+    state.stats.aura = Math.max(10, state.stats.aura - 1);
+    state.stats.int = Math.max(10, state.stats.int - 1);
 
     const rankInfo = calculateRank(state.player.level);
     state.player.rank = rankInfo.rank;
@@ -875,8 +993,7 @@ export function reverseXp(amount, sourceTitle = '') {
   }
 
   saveState(state);
-  renderHud();
-  renderDashboardAnalytics();
+  renderAll();
 }
 
 function triggerLevelUpModal(oldLvl, newLvl) {
@@ -1303,19 +1420,15 @@ function renderDailyQuests() {
 
       if (quest.done) {
         try { audio.playQuestComplete(); } catch (e) {}
-        state.player.gold = (Number(state.player.gold) || 0) + (Number(quest.gold) || 0);
+        state.player.gold = (state.player.gold || 0) + (quest.gold || 0);
         addXp(quest.xp, quest.title);
+        showToast(`Quest Completed: ${quest.title} (+${quest.xp} XP)`);
       } else {
         try { audio.playClick(); } catch (e) {}
-        state.player.gold = Math.max(0, (Number(state.player.gold) || 0) - (Number(quest.gold) || 0));
+        state.player.gold = Math.max(0, (state.player.gold || 0) - (quest.gold || 0));
         reverseXp(quest.xp, quest.title);
-        showToast(`Unticked: -${quest.xp} XP reversed`);
+        showToast(`Unticked: ${quest.title} (-${quest.xp} XP)`);
       }
-
-      saveState(state);
-      renderDailyQuests();
-      renderHud();
-      renderDashboardAnalytics();
     });
   });
 }
@@ -1811,26 +1924,22 @@ function renderWeeklyCalendar() {
         const isDone = !state.pillarForge.weeklySchedule[dayKey].done;
         state.pillarForge.weeklySchedule[dayKey].done = isDone;
 
-        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+        if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
         if (isDone) {
-          try { audio.playQuestComplete(); } catch (err) {}
-          state.pillarForge.workoutsDone = (Number(state.pillarForge.workoutsDone) || 0) + 1;
-          state.pillarForge.currentStreak = (Number(state.pillarForge.currentStreak) || 0) + 1;
-          state.stats.str = (Number(state.stats.str) || 10) + 1;
+          try { audio.playQuestComplete(); } catch (e) {}
+          state.pillarForge.workoutsDone = (state.pillarForge.workoutsDone || 0) + 1;
+          state.pillarForge.currentStreak = (state.pillarForge.currentStreak || 0) + 1;
+          state.stats.str = (state.stats.str || 10) + 1;
           addXp(40, `Completed ${state.pillarForge.weeklySchedule[dayKey].day} Split`);
-          showToast(`Completed ${state.pillarForge.weeklySchedule[dayKey].day} Split: +40 XP`);
+          showToast(`Completed ${state.pillarForge.weeklySchedule[dayKey].day} Split: +40 XP (+1 STR)`);
         } else {
-          try { audio.playClick(); } catch (err) {}
+          try { audio.playClick(); } catch (e) {}
           if (state.pillarForge.workoutsDone > 0) state.pillarForge.workoutsDone--;
           if (state.pillarForge.currentStreak > 0) state.pillarForge.currentStreak--;
-          state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
+          state.stats.str = Math.max(10, (state.stats.str || 10) - 1);
           reverseXp(40, `Reversed ${state.pillarForge.weeklySchedule[dayKey].day} Split`);
-          showToast('Unticked workout split: -40 XP reversed');
+          showToast(`Unticked ${state.pillarForge.weeklySchedule[dayKey].day} split: -40 XP`);
         }
-
-        saveState(state);
-        renderPillarForge();
-        renderHud();
       }
     });
   });
@@ -1868,20 +1977,18 @@ function renderStrengthExercisesList() {
       const idx = parseInt(chk.getAttribute('data-idx'), 10);
       if (list[idx]) {
         list[idx].done = chk.checked;
-        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+        if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
         if (chk.checked) {
-          try { audio.playQuestComplete(); } catch (err) {}
-          state.stats.str = (Number(state.stats.str) || 10) + 1;
+          try { audio.playQuestComplete(); } catch (e) {}
+          state.stats.str = (state.stats.str || 10) + 1;
           addXp(25, `Finished ${list[idx].name} (${list[idx].sets} sets)`);
+          showToast(`Exercise completed: ${list[idx].name} (+25 XP, +1 STR)`);
         } else {
-          try { audio.playClick(); } catch (err) {}
-          state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
+          try { audio.playClick(); } catch (e) {}
+          state.stats.str = Math.max(10, (state.stats.str || 10) - 1);
           reverseXp(25, `Finished ${list[idx].name} (${list[idx].sets} sets)`);
           showToast(`Unticked exercise: -25 XP reversed`);
         }
-        saveState(state);
-        renderStrengthExercisesList();
-        renderHud();
       }
     });
   });
@@ -2077,20 +2184,18 @@ function renderPillarHunter() {
         const t = dawnTasks[idx];
         if (!t) return;
         t.done = !t.done;
-        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+        if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
         if (t.done) {
           try { audio.playQuestComplete(); } catch (e) {}
-          state.stats.cha = (Number(state.stats.cha) || 10) + 1;
+          state.stats.cha = (state.stats.cha || 10) + 1;
           addXp(t.xp, t.text);
+          showToast(`Morning Routine: ${t.text} (+${t.xp} XP, +1 CHA)`);
         } else {
           try { audio.playClick(); } catch (e) {}
-          state.stats.cha = Math.max(10, (Number(state.stats.cha) || 10) - 1);
+          state.stats.cha = Math.max(10, (state.stats.cha || 10) - 1);
           reverseXp(t.xp, t.text);
-          showToast(`Unticked: -${t.xp} XP reversed`);
+          showToast(`Unticked: ${t.text} (-${t.xp} XP)`);
         }
-        saveState(state);
-        renderPillarHunter();
-        renderHud();
       });
     });
   }
@@ -2113,20 +2218,18 @@ function renderPillarHunter() {
         const t = nightTasks[idx];
         if (!t) return;
         t.done = !t.done;
-        if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+        if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
         if (t.done) {
           try { audio.playQuestComplete(); } catch (e) {}
-          state.stats.vit = (Number(state.stats.vit) || 10) + 1;
+          state.stats.vit = (state.stats.vit || 10) + 1;
           addXp(t.xp, t.text);
+          showToast(`Night Routine: ${t.text} (+${t.xp} XP, +1 VIT)`);
         } else {
           try { audio.playClick(); } catch (e) {}
-          state.stats.vit = Math.max(10, (Number(state.stats.vit) || 10) - 1);
+          state.stats.vit = Math.max(10, (state.stats.vit || 10) - 1);
           reverseXp(t.xp, t.text);
-          showToast(`Unticked: -${t.xp} XP reversed`);
+          showToast(`Unticked: ${t.text} (-${t.xp} XP)`);
         }
-        saveState(state);
-        renderPillarHunter();
-        renderHud();
       });
     });
   }
@@ -2205,26 +2308,21 @@ function renderAptDrills() {
   container.querySelectorAll('.apt-drill-item').forEach(item => {
     item.addEventListener('click', (e) => {
       const idx = parseInt(item.getAttribute('data-apt-idx'), 10);
-      if (!drills[idx]) return;
-      if (e.target.tagName !== 'INPUT') {
-        drills[idx].done = !drills[idx].done;
-      } else {
-        drills[idx].done = e.target.checked;
+      if (drills[idx]) {
+        drills[idx].done = (e.target.tagName === 'INPUT') ? e.target.checked : !drills[idx].done;
+        if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
+        if (drills[idx].done) {
+          try { audio.playQuestComplete(); } catch (e) {}
+          state.stats.str = (state.stats.str || 10) + 1;
+          addXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
+          showToast(`Pelvic drill completed: +15 XP`);
+        } else {
+          try { audio.playClick(); } catch (e) {}
+          state.stats.str = Math.max(10, (state.stats.str || 10) - 1);
+          reverseXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
+          showToast('Unticked drill: -15 XP reversed');
+        }
       }
-      if (!state.stats || typeof state.stats !== 'object') state.stats = {};
-      if (drills[idx].done) {
-        try { audio.playQuestComplete(); } catch (err) {}
-        state.stats.str = (Number(state.stats.str) || 10) + 1;
-        addXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
-      } else {
-        try { audio.playClick(); } catch (err) {}
-        state.stats.str = Math.max(10, (Number(state.stats.str) || 10) - 1);
-        reverseXp(15, `Pelvic Drill: ${drills[idx].text.split('(')[0]}`);
-        showToast('Unticked drill: -15 XP reversed');
-      }
-      saveState(state);
-      renderAptDrills();
-      renderHud();
     });
   });
 }
@@ -2332,20 +2430,18 @@ function renderPillarAura() {
       const t = tasks[idx];
       if (!t) return;
       t.done = !t.done;
-      if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+      if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
       if (t.done) {
         try { audio.playQuestComplete(); } catch (e) {}
-        state.stats.aura = (Number(state.stats.aura) || 10) + 2;
+        state.stats.aura = (state.stats.aura || 10) + 2;
         addXp(t.xp, t.text);
+        showToast(`Habit Completed: ${t.text} (+${t.xp} XP, +2 AURA)`);
       } else {
         try { audio.playClick(); } catch (e) {}
-        state.stats.aura = Math.max(10, (Number(state.stats.aura) || 10) - 2);
+        state.stats.aura = Math.max(10, (state.stats.aura || 10) - 2);
         reverseXp(t.xp, t.text);
-        showToast(`Unticked: -${t.xp} XP reversed`);
+        showToast(`Unticked: ${t.text} (-${t.xp} XP)`);
       }
-      saveState(state);
-      renderPillarAura();
-      renderHud();
     });
   });
 
@@ -2492,21 +2588,18 @@ function renderPillarApex() {
       if (!t) return;
 
       t.done = !t.done;
-      if (!state.stats || typeof state.stats !== 'object') state.stats = {};
+      if (!state.stats) state.stats = { cha: 10, vit: 10, str: 10, pur: 10, aura: 10, int: 10 };
       if (t.done) {
         try { audio.playQuestComplete(); } catch (e) {}
-        state.stats.int = (Number(state.stats.int) || 10) + 1;
+        state.stats.int = (state.stats.int || 10) + 1;
         addXp(t.xp, t.title);
-        showToast(`${t.title} completed: +${t.xp} XP (+1 INT)`);
+        showToast(`Career Track Completed: ${t.title} (+${t.xp} XP, +1 INT)`);
       } else {
         try { audio.playClick(); } catch (e) {}
-        state.stats.int = Math.max(10, (Number(state.stats.int) || 10) - 1);
+        state.stats.int = Math.max(10, (state.stats.int || 10) - 1);
         reverseXp(t.xp, t.title);
-        showToast(`Unticked ${t.title}: -${t.xp} XP reversed`);
+        showToast(`Unticked: ${t.title} (-${t.xp} XP)`);
       }
-      saveState(state);
-      renderPillarApex();
-      renderHud();
     });
   });
 }
@@ -3076,18 +3169,11 @@ function setupCloudSync() {
     }
     const remote = await pullStateFromCloud();
     if (remote && typeof remote === 'object') {
-      const isStub = !remote.stats || typeof remote.player !== 'object' || !remote.pillarHunter;
-      if (isStub) {
-        console.warn('Cloud state was a stub or incomplete. Healing cloud with local state.');
-        await pushStateToCloud(state);
-        showToast('Remote cloud was incomplete; synchronized current state up to cloud.');
-      } else {
-        state = validateAndRepairState(remote);
-        saveState(state);
-        renderAll();
-        try { audio.playQuestComplete(); } catch (e) {}
-        showToast('SUCCESS: Loaded latest data from cloud! UI refreshed.');
-      }
+      state = reconcileState(remote);
+      saveState(state);
+      renderAll();
+      audio.playQuestComplete();
+      showToast('SUCCESS: Loaded latest data from cloud! UI refreshed.');
     } else {
       showToast('Cloud is connected, but no remote data was found for this User ID.');
     }
@@ -3102,7 +3188,7 @@ function setupCloudSync() {
     }
     const res = await pushStateToCloud(state);
     if (res.success) {
-      try { audio.playQuestComplete(); } catch (e) {}
+      audio.playQuestComplete();
       showToast('SUCCESS: Local progress uploaded to Cloud!');
     } else {
       showToast(`Push failed: ${res.error}`);
@@ -3135,15 +3221,9 @@ function setupCloudSync() {
       try {
         const remote = await pullStateFromCloud();
         if (remote && typeof remote === 'object') {
-          const isStub = !remote.stats || typeof remote.player !== 'object' || !remote.pillarHunter;
-          if (isStub) {
-            console.warn('Initial cloud sync: remote was stub or incomplete. Uploading healthy local state to heal cloud.');
-            await pushStateToCloud(state);
-          } else {
-            state = validateAndRepairState(remote);
-            saveState(state);
-            renderAll();
-          }
+          state = reconcileState(remote);
+          saveState(state);
+          renderAll();
         }
       } catch (e) {
         console.warn('Initial cloud sync check skipped:', e);

@@ -11,6 +11,7 @@ function setupCanvas(canvasId, fallbackWidth = 400, fallbackHeight = 150) {
   if (!canvas) return null;
 
   const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || fallbackWidth;
   const height = canvas.clientHeight || fallbackHeight;

@@ -10,15 +10,16 @@ let debounceTimer = null;
 let syncStatusListeners = [];
 
 export function getCloudConfig() {
+  const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
   try {
     const raw = localStorage.getItem(SYNC_CONFIG_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
     return {
       provider: parsed.provider || 'supabase', // 'supabase' or 'firebase'
-      supabaseUrl: parsed.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL,
-      supabaseAnonKey: parsed.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_KEY,
-      firebaseProjectId: parsed.firebaseProjectId || import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-      firebaseApiKey: parsed.firebaseApiKey || import.meta.env.VITE_FIREBASE_API_KEY || '',
+      supabaseUrl: parsed.supabaseUrl || env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL,
+      supabaseAnonKey: parsed.supabaseAnonKey || env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_KEY,
+      firebaseProjectId: parsed.firebaseProjectId || env.VITE_FIREBASE_PROJECT_ID || '',
+      firebaseApiKey: parsed.firebaseApiKey || env.VITE_FIREBASE_API_KEY || '',
       syncUserId: parsed.syncUserId || 'suhas_s',
       autoSync: parsed.autoSync !== false,
       lastSyncedAt: parsed.lastSyncedAt || null
@@ -28,8 +29,8 @@ export function getCloudConfig() {
       provider: 'supabase',
       supabaseUrl: DEFAULT_SUPABASE_URL,
       supabaseAnonKey: DEFAULT_SUPABASE_KEY,
-      firebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-      firebaseApiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+      firebaseProjectId: env.VITE_FIREBASE_PROJECT_ID || '',
+      firebaseApiKey: env.VITE_FIREBASE_API_KEY || '',
       syncUserId: 'suhas_s',
       autoSync: true,
       lastSyncedAt: null
