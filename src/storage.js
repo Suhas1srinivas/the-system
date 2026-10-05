@@ -45,11 +45,11 @@ export function getDefaultState() {
     diaryEntries: [],
     pillarPurity: {
       streakDays: 0,
-      lastRelapseTimestamp: now,
+      lastRelapseTimestamp: new Date('2026-10-05T00:00:00').getTime(),
       breachHistory: []
     },
     pillarEngine: {
-      smokeFreeStartTimestamp: now,
+      smokeFreeStartTimestamp: new Date('2026-10-05T00:00:00').getTime(),
       cigsAvoidedCount: 0,
       moneySaved: 0,
       cravingSurfedCount: 0
@@ -301,6 +301,18 @@ export function loadState() {
       const rankInfo = calculateRank(parsed.player.level || 1);
       parsed.player.rank = rankInfo.rank;
       parsed.player.title = rankInfo.title;
+    }
+
+    // Anchor smoke-free and purity timestamps to campaign launch (Oct 5, 2026, 00:00:00)
+    // so continuous clean time is measured accurately from midnight when the game officially started
+    const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+    if (Date.now() >= campaignStart) {
+      if (parsed.pillarEngine && (!parsed.pillarEngine.smokeFreeStartTimestamp || parsed.pillarEngine.smokeFreeStartTimestamp > campaignStart)) {
+        parsed.pillarEngine.smokeFreeStartTimestamp = campaignStart;
+      }
+      if (parsed.pillarPurity && (!parsed.pillarPurity.lastRelapseTimestamp || (parsed.pillarPurity.lastRelapseTimestamp > campaignStart && (!parsed.pillarPurity.breachHistory || parsed.pillarPurity.breachHistory.length === 0)))) {
+        parsed.pillarPurity.lastRelapseTimestamp = campaignStart;
+      }
     }
 
     return { ...defaultState, ...parsed };

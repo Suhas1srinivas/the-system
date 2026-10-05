@@ -165,7 +165,8 @@ function renderDashboardAnalytics() {
 
   const smokeEl = document.getElementById('dash-kpi-smoke');
   const smokeSub = document.getElementById('dash-kpi-smoke-sub');
-  const smokeStart = state.pillarEngine?.smokeFreeStartTimestamp || Date.now();
+  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  const smokeStart = state.pillarEngine?.smokeFreeStartTimestamp || campaignStart;
   const diffMs = Math.max(Date.now() - smokeStart, 0);
   const diffHours = diffMs / 3600000;
   const smokeDays = Math.floor(diffHours / 24);
@@ -1251,7 +1252,8 @@ function updatePurityStreakDisplay() {
   const hoursEl = document.getElementById('purity-streak-hours');
   if (!daysEl || !hoursEl) return;
 
-  const start = state.pillarPurity.lastRelapseTimestamp || Date.now();
+  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  const start = state.pillarPurity.lastRelapseTimestamp || campaignStart;
   const diffMs = Math.max(Date.now() - start, 0);
   const totalHours = Math.floor(diffMs / 3600000);
   const days = Math.floor(totalHours / 24);
@@ -1461,7 +1463,8 @@ function updateSmokeRecoveryMeters() {
   const timerEl = document.getElementById('smoke-free-counter');
   if (!timerEl) return;
 
-  const start = state.pillarEngine.smokeFreeStartTimestamp || Date.now();
+  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  const start = state.pillarEngine.smokeFreeStartTimestamp || campaignStart;
   const diffMs = Math.max(Date.now() - start, 0);
   const totalSecs = Math.floor(diffMs / 1000);
   const days = Math.floor(totalSecs / 86400);
