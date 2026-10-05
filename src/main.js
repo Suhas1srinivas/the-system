@@ -877,8 +877,24 @@ function setupLevelUpModal() {
 }
 
 // ==========================================================================
-// LEFT-SIDEBAR NAVIGATION
+// LEFT-SIDEBAR & MOBILE NAVIGATION
 // ==========================================================================
+function openMobileDrawer() {
+  const sidebar = document.querySelector('.sidebar-nav');
+  const backdrop = document.getElementById('mobile-sidebar-backdrop');
+  if (sidebar) sidebar.classList.add('mobile-open');
+  if (backdrop) backdrop.classList.add('active');
+  document.body.classList.add('mobile-drawer-open');
+}
+
+function closeMobileDrawer() {
+  const sidebar = document.querySelector('.sidebar-nav');
+  const backdrop = document.getElementById('mobile-sidebar-backdrop');
+  if (sidebar) sidebar.classList.remove('mobile-open');
+  if (backdrop) backdrop.classList.remove('active');
+  document.body.classList.remove('mobile-drawer-open');
+}
+
 function switchTab(targetTab) {
   if (isSystemInStasisToday() && targetTab !== 'rules') {
     showToast('System is in Stasis for today. Tasks and down pages are locked.');
@@ -886,6 +902,15 @@ function switchTab(targetTab) {
   }
   const tabs = document.querySelectorAll('.nav-item');
   tabs.forEach(t => {
+    if (t.getAttribute('data-tab') === targetTab) {
+      t.classList.add('active');
+    } else {
+      t.classList.remove('active');
+    }
+  });
+
+  const mbTabs = document.querySelectorAll('.mb-nav-item[data-tab]');
+  mbTabs.forEach(t => {
     if (t.getAttribute('data-tab') === targetTab) {
       t.classList.add('active');
     } else {
@@ -917,8 +942,67 @@ function setupNavigation() {
       }
       audio.playClick();
       switchTab(targetTab);
+      closeMobileDrawer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
+
+  // Dedicated Mobile Bottom Navigation Items
+  const mbTabs = document.querySelectorAll('.mb-nav-item[data-tab]');
+  mbTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetTab = tab.getAttribute('data-tab');
+      if (isSystemInStasisToday() && targetTab !== 'rules') {
+        showToast('System is in Stasis for today. Tasks and down pages are locked.');
+        return;
+      }
+      audio.playClick();
+      switchTab(targetTab);
+      closeMobileDrawer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Mobile Hamburger Toggle
+  const toggleBtn = document.getElementById('btn-mobile-menu-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      audio.playClick();
+      const sidebar = document.querySelector('.sidebar-nav');
+      if (sidebar && sidebar.classList.contains('mobile-open')) {
+        closeMobileDrawer();
+      } else {
+        openMobileDrawer();
+      }
+    });
+  }
+
+  // Mobile Bottom "More" Button
+  const moreBtn = document.getElementById('btn-mobile-bottom-more');
+  if (moreBtn) {
+    moreBtn.addEventListener('click', () => {
+      audio.playClick();
+      openMobileDrawer();
+    });
+  }
+
+  // Mobile Backdrop Click
+  const backdrop = document.getElementById('mobile-sidebar-backdrop');
+  if (backdrop) {
+    backdrop.addEventListener('click', () => {
+      audio.playClick();
+      closeMobileDrawer();
+    });
+  }
+
+  // Mobile Drawer Close Button
+  const closeBtn = document.getElementById('btn-mobile-drawer-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      audio.playClick();
+      closeMobileDrawer();
+    });
+  }
 
   // Quick Write Diary Button in Top Bar
   const quickDiaryBtn = document.getElementById('btn-quick-diary');
@@ -930,6 +1014,7 @@ function setupNavigation() {
       }
       audio.playClick();
       switchTab('diary');
+      closeMobileDrawer();
       const input = document.getElementById('diary-title-input');
       if (input) input.focus();
     });
@@ -941,6 +1026,7 @@ function setupNavigation() {
     gotoDiaryBtn.addEventListener('click', () => {
       audio.playClick();
       switchTab('diary');
+      closeMobileDrawer();
     });
   }
 }

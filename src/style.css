@@ -6632,4 +6632,553 @@ body.system-stasis-active .quest-checkbox {
   color: #94a3b8;
 }
 
+/* ==========================================================================
+   RESPONSIVE LAYOUT ENGINE & MOBILE DEDICATED VIEW
+   Desktop view (> 820px) remains 100% exactly as it is.
+   Mobile view (<= 820px) automatically switches to a dedicated full-phone layout.
+   ========================================================================== */
+
+/* 1. DESKTOP VIEW OVERRIDES (> 820px)
+   Completely hides all mobile-only controls to preserve 100% of original desktop experience */
+@media (min-width: 821px) {
+  .mobile-bottom-nav,
+  .mobile-menu-toggle,
+  .mobile-sidebar-backdrop,
+  .mobile-drawer-close {
+    display: none !important;
+  }
+}
+
+/* 2. DEDICATED FULL-SCREEN MOBILE LAYOUT (<= 820px) */
+@media (max-width: 820px) {
+  /* Prevent horizontal document overflow */
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.mobile-drawer-open {
+    overflow: hidden;
+  }
+
+  /* Silent Sovereign Background on Mobile */
+  .sovereign-bg-container {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .sovereign-bg-iframe {
+    transform: scale(1.35);
+    transform-origin: 50% 32%;
+  }
+
+  /* Full screen app layout column */
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Sidebar off-canvas slide-out drawer */
+  .sidebar-nav {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    bottom: 0;
+    width: min(85vw, 300px);
+    min-width: 0;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 1050;
+    background: rgba(3, 7, 18, 0.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-right: 1px solid var(--border-cyan);
+    box-shadow: 12px 0 45px rgba(0, 0, 0, 0.95);
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 16px 14px 40px 14px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar-nav.mobile-open {
+    left: 0 !important;
+  }
+
+  /* Sidebar Backdrop */
+  .mobile-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+
+  .mobile-sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Sidebar Drawer Header & Close Button */
+  .sidebar-brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .mobile-drawer-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: var(--radius-sm);
+    color: var(--neon-cyan);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-drawer-close:hover,
+  .mobile-drawer-close:active {
+    background: rgba(0, 240, 255, 0.2);
+    border-color: var(--neon-cyan);
+  }
+
+  /* Main Wrapper: full phone screen width */
+  .main-wrapper {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* Top Action Bar Mobile */
+  .top-action-bar {
+    padding: 8px 10px;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .top-bar-main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  /* Hamburger Menu Button */
+  .mobile-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+  }
+
+  .mobile-menu-toggle:active {
+    background: rgba(0, 240, 255, 0.25);
+  }
+
+  .mobile-menu-toggle .mmt-bar {
+    width: 18px;
+    height: 2px;
+    background: var(--neon-cyan);
+    border-radius: 1px;
+    box-shadow: 0 0 6px var(--neon-cyan);
+  }
+
+  .top-left-cluster {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .top-date-text {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+  }
+
+  .top-reset-badge {
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .top-player-pill {
+    padding: 3px 8px;
+    gap: 6px;
+  }
+
+  .top-player-name {
+    font-size: 0.76rem;
+  }
+
+  .top-player-rank {
+    font-size: 0.68rem;
+    padding: 1px 4px;
+  }
+
+  .top-xp-group {
+    width: 100%;
+    min-width: 100%;
+    order: 10;
+    margin-top: 2px;
+  }
+
+  .top-currency-group {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .curr-pill {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+  }
+
+  .quick-diary-btn {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+  }
+
+  .btn-cloud-hud {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Timeline & Campaign Status Box */
+  .top-timeline-box {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 10px;
+    padding: 6px 10px;
+    font-size: 0.72rem;
+    width: 100%;
+  }
+
+  .ttb-sep {
+    display: none;
+  }
+
+  .ttb-item {
+    justify-content: space-between;
+  }
+
+  /* Main Viewport Mobile Padding (preserves room for bottom nav) */
+  .content-viewport {
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    padding: 12px 10px calc(76px + env(safe-area-inset-bottom, 14px)) 10px;
+    overflow-x: hidden;
+  }
+
+  /* Dedicated Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(58px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(3, 7, 18, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(0, 240, 255, 0.28);
+    box-shadow: 0 -6px 25px rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .mb-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    position: relative;
+    padding: 6px 0 4px 0;
+    transition: color 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mb-nav-item:active {
+    transform: scale(0.94);
+  }
+
+  .mb-nav-item .mb-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .mb-nav-item.active {
+    color: var(--neon-cyan);
+  }
+
+  .mb-nav-item.active .mb-icon {
+    transform: translateY(-2px);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+  }
+
+  .mb-nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 22%;
+    right: 22%;
+    height: 2.5px;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
+    border-radius: 0 0 3px 3px;
+  }
+
+  /* Full Screen Cards & Responsive Components */
+  .glass-panel {
+    padding: 14px 12px;
+    border-radius: var(--radius-sm);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .aura-hero-card {
+    padding: 16px 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .aura-hero-top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .aura-main-title {
+    font-size: 1.35rem;
+  }
+
+  .campaign-countdown-box {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .cc-timer {
+    justify-content: center;
+  }
+
+  .aura-freeze-console {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .afc-status-col {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-instant-freeze {
+    width: 100%;
+    padding: 10px 14px;
+    text-align: center;
+  }
+
+  .aura-ranks-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  /* Dashboard Analytics on Mobile */
+  .dashboard-kpi-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .kpi-card {
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .kpi-icon {
+    font-size: 1.6rem;
+  }
+
+  .kpi-value {
+    font-size: 1.3rem;
+  }
+
+  .dash-flagship-charts-row {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .dash-flagship-chart-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 14px 10px;
+  }
+
+  .radar-canvas-wrap,
+  .growth-trend-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  canvas#stats-radar-canvas,
+  canvas#growth-trend-canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Daily Routine (Dawn & Dusk) Columns */
+  .routine-columns,
+  .hunter-columns,
+  .forge-columns {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  /* Workout Split Rows */
+  .weekly-split-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .cal-inspector-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .cal-widget-box {
+    padding: 14px 10px;
+  }
+
+  /* Input fields and buttons */
+  .meta-field.flex-grow,
+  .custom-reward-form input,
+  .fsc-header-left {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  /* Mobile Modals */
+  .hud-modal-overlay .hud-modal {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: 85vh !important;
+    padding: 16px 12px !important;
+    margin: auto;
+    box-sizing: border-box;
+  }
+
+  .emergency-modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    padding: 14px 10px !important;
+    box-sizing: border-box;
+  }
+
+  /* Toast alerts safe from bottom bar */
+  .hud-toast-container,
+  .toast-container {
+    bottom: 70px !important;
+    left: 12px !important;
+    right: 12px !important;
+    max-width: calc(100% - 24px) !important;
+  }
+
+  /* Responsive Tables */
+  .table-responsive,
+  .log-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Extra small phone tweaks (<= 400px) */
+@media (max-width: 400px) {
+  .dashboard-kpi-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .top-timeline-box {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .mb-nav-item .mb-label {
+    font-size: 0.58rem;
+  }
+
+  .mb-nav-item .mb-icon {
+    font-size: 1.05rem;
+  }
+}
+
+
 

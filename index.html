@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>LIFE OS // THE SYSTEM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,8 @@
 
   <!-- Main App Layout with Left-Hand Sidebar -->
   <div class="app-layout">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="mobile-sidebar-backdrop" id="mobile-sidebar-backdrop"></div>
 
     <!-- ============================================ -->
     <!-- LEFT-HAND SIDEBAR NAVIGATION -->
@@ -30,7 +32,10 @@
       
       <!-- Brand & Date -->
       <div class="sidebar-brand">
-        <h1 class="brand-title">THE SYSTEM</h1>
+        <div class="sidebar-brand-header">
+          <h1 class="brand-title">THE SYSTEM</h1>
+          <button class="mobile-drawer-close" id="btn-mobile-drawer-close" aria-label="Close Menu">✕</button>
+        </div>
         <div class="sidebar-date-display" id="sidebar-live-date">
           <span class="date-bullet"></span>
           <span class="date-text" id="live-date-str">Loading date...</span>
@@ -109,6 +114,13 @@
       <!-- Top Action Bar -->
       <header class="top-action-bar">
         <div class="top-bar-main-row">
+          <!-- Mobile Menu Hamburger Button -->
+          <button class="mobile-menu-toggle" id="btn-mobile-menu-toggle" aria-label="Toggle Navigation Drawer">
+            <span class="mmt-bar"></span>
+            <span class="mmt-bar"></span>
+            <span class="mmt-bar"></span>
+          </button>
+
           <!-- Date & Reset Countdown -->
           <div class="top-left-cluster">
             <span class="top-date-text" id="header-full-date">Sunday, October 4, 2026</span>
@@ -1867,6 +1879,34 @@ create policy "Allow all for anon" on user_state for all using (true) with check
       </div>
     </div>
   </div>
+
+  <!-- Dedicated Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mb-nav-item active" data-tab="rules" aria-label="Menu">
+      <span class="mb-icon">📜</span>
+      <span class="mb-label">Menu</span>
+    </button>
+    <button class="mb-nav-item" data-tab="dashboard" aria-label="Stats">
+      <span class="mb-icon">📊</span>
+      <span class="mb-label">Stats</span>
+    </button>
+    <button class="mb-nav-item" data-tab="hunter" aria-label="Routine">
+      <span class="mb-icon">⚔️</span>
+      <span class="mb-label">Routine</span>
+    </button>
+    <button class="mb-nav-item" data-tab="forge" aria-label="Fitness">
+      <span class="mb-icon">🛡️</span>
+      <span class="mb-label">Fitness</span>
+    </button>
+    <button class="mb-nav-item" data-tab="apex" aria-label="Career">
+      <span class="mb-icon">💼</span>
+      <span class="mb-label">Career</span>
+    </button>
+    <button class="mb-nav-item mb-nav-more" id="btn-mobile-bottom-more" aria-label="More Pillars">
+      <span class="mb-icon">☰</span>
+      <span class="mb-label">More</span>
+    </button>
+  </nav>
 
   <!-- ============================================ -->
   <!-- SCRIPT ENTRY -->
