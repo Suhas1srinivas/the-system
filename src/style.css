@@ -44,7 +44,18 @@
   --shadow-neon-crimson: 0 0 20px rgba(239, 68, 68, 0.4);
 }
 
-/* Base Reset */
+/* Base Reset & Smooth Scrolling */
+html, body, .content-viewport, .sidebar-nav, .diary-entries-list, .strength-exercises-list, .modal-body, .heatmap-scroll-wrap {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -59,6 +70,34 @@ body.system-theme {
   overflow-x: hidden;
   position: relative;
   line-height: 1.55;
+  scroll-behavior: smooth;
+}
+
+/* Global Sleek Futuristic Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.28) rgba(1, 3, 11, 0.4);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(1, 3, 11, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.25);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 
 /* ==========================================================================
@@ -72,6 +111,7 @@ body.system-theme {
   overflow: hidden;
   z-index: 0;
   pointer-events: none;
+  contain: strict;
 }
 
 .sovereign-bg-iframe {
@@ -80,8 +120,7 @@ body.system-theme {
   border: none;
   display: block;
   pointer-events: none;
-  filter: brightness(0.82) contrast(1.22) saturate(1.25);
-  transform: scale(1.06);
+  transform: scale(1.04);
   transform-origin: 55% 38%;
   will-change: transform;
 }
@@ -89,7 +128,7 @@ body.system-theme {
 .sovereign-bg-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 60% 40%, rgba(1, 3, 11, 0.2) 0%, rgba(1, 3, 11, 0.58) 65%, rgba(1, 3, 11, 0.88) 100%);
+  background: radial-gradient(circle at 60% 40%, rgba(1, 3, 11, 0.2) 0%, rgba(1, 3, 11, 0.62) 65%, rgba(1, 3, 11, 0.92) 100%);
   pointer-events: none;
 }
 
@@ -384,6 +423,20 @@ body.system-theme {
   top: 0;
   z-index: 90;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.3s ease;
+  will-change: background, box-shadow;
+}
+
+.top-action-bar.scrolled {
+  background: rgba(8, 12, 24, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom-color: rgba(0, 240, 255, 0.38);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 240, 255, 0.15);
+  padding: 8px 24px;
 }
 
 .top-bar-main-row {
@@ -598,25 +651,54 @@ body.system-theme {
 }
 
 /* ==========================================================================
-   CONTENT VIEWPORT
+   CONTENT VIEWPORT & SMOOTH PAGE TRANSITIONS
    ========================================================================== */
 .content-viewport {
   padding: 24px 28px 60px;
   flex: 1;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tab-panel {
   display: none;
-  animation: fadeInPanel 0.25s ease-out;
+  opacity: 0;
+  will-change: opacity, transform;
 }
 
 .tab-panel.active {
   display: block;
+  animation: smoothPageEnter 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes fadeInPanel {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes smoothPageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.996);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Staggered smooth entrance for sections and cards inside active tab */
+.tab-panel.active > *:nth-child(1) { animation: smoothCardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.02s backwards; }
+.tab-panel.active > *:nth-child(2) { animation: smoothCardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.06s backwards; }
+.tab-panel.active > *:nth-child(3) { animation: smoothCardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.10s backwards; }
+.tab-panel.active > *:nth-child(4) { animation: smoothCardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.14s backwards; }
+.tab-panel.active > *:nth-child(5) { animation: smoothCardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.18s backwards; }
+.tab-panel.active > *:nth-child(6) { animation: smoothCardEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.22s backwards; }
+
+@keyframes smoothCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Glass Panel Generic */
@@ -630,6 +712,9 @@ body.system-theme {
   box-shadow: var(--shadow-hud);
   position: relative;
   overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s ease,
+              border-color 0.25s ease;
 }
 
 .glass-panel::before {
@@ -3235,20 +3320,22 @@ body.system-theme {
   font-size: 0.85rem;
   font-weight: 900;
   color: transparent;
-  transition: all 0.2s ease;
+  transition: all 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   flex-shrink: 0;
 }
 
 .quest-item:hover .quest-checkbox {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  transform: scale(1.05);
 }
 
 .quest-item.completed .quest-checkbox {
   background: var(--neon-green);
   border-color: var(--neon-green);
   color: #000;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.65);
+  transform: scale(1.08);
 }
 
 .quest-title {
@@ -6401,7 +6488,10 @@ body.system-stasis-active .quest-checkbox {
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s ease,
+              border-color 0.25s ease,
+              background 0.25s ease;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
 }
 

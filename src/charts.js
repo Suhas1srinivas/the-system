@@ -8,7 +8,7 @@
 // Helper to set up responsive canvas with High-DPI support
 function setupCanvas(canvasId, fallbackWidth = 400, fallbackHeight = 150) {
   const canvas = document.getElementById(canvasId);
-  if (!canvas) return null;
+  if (!canvas || (canvas.offsetParent === null && getComputedStyle(canvas).position !== 'fixed')) return null;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;

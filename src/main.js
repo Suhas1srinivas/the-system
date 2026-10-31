@@ -69,6 +69,7 @@ export function showToast(message, type = 'info', duration = 3200) {
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
+  setupScrollEffects();
   setupLiveDates();
   setupAudioControls();
   setupMidnightCountdown();
@@ -210,6 +211,9 @@ function renderHud() {
 // DASHBOARD ANALYTICS & PROGRESS CENTER
 // ==========================================================================
 function renderDashboardAnalytics() {
+  const dashTab = document.getElementById('tab-dashboard');
+  if (!dashTab || !dashTab.classList.contains('active')) return;
+
   // 1. Top KPI Cards
   const purStreak = state.pillarPurity.streakDays || 0;
   const purEl = document.getElementById('dash-kpi-purity');
@@ -1058,11 +1062,31 @@ function switchTab(targetTab) {
     activePanel.classList.add('active');
   }
 
+  // Smooth scroll back to top of page upon navigating to any tab
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
   if (targetTab === 'dashboard') {
     requestAnimationFrame(() => {
       renderDashboardAnalytics();
     });
   }
+}
+
+function setupScrollEffects() {
+  const topBar = document.querySelector('.top-action-bar');
+  if (!topBar) return;
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const isScrolled = window.scrollY > 15;
+        topBar.classList.toggle('scrolled', isScrolled);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 function setupNavigation() {

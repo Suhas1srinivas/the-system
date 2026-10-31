@@ -5,7 +5,7 @@
 
 export function renderRadarChart(canvasId, stats) {
   const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
+  if (!canvas || (canvas.offsetParent === null && getComputedStyle(canvas).position !== 'fixed')) return;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
