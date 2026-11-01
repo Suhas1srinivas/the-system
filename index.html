@@ -172,29 +172,6 @@
             <span class="cloud-status-label" id="hud-cloud-label">Cloud Sync</span>
           </button>
         </div>
-
-        <!-- Timeline & Campaign Status Box -->
-        <div class="top-timeline-box glass-panel">
-          <div class="ttb-item">
-            <span class="ttb-label">Timeline:</span>
-            <span class="ttb-val neon-cyan font-mono" id="hud-timeline-window">Oct 5 ➔ <span id="hud-timeline-end">Apr 1, 2027</span></span>
-          </div>
-          <span class="ttb-sep">•</span>
-          <div class="ttb-item">
-            <span class="ttb-label">Discipline:</span>
-            <span class="ttb-val neon-gold font-mono" id="hud-discipline-days">178 Days</span>
-          </div>
-          <span class="ttb-sep">•</span>
-          <div class="ttb-item">
-            <span class="ttb-label">Frozen:</span>
-            <span class="ttb-val neon-purple font-mono" id="hud-frozen-days">0 Days</span>
-          </div>
-          <span class="ttb-sep">•</span>
-          <div class="ttb-item">
-            <span class="ttb-label">Extension:</span>
-            <span class="ttb-val neon-green font-mono" id="hud-extension-days">+0 Days</span>
-          </div>
-        </div>
       </header>
 
       <!-- Scrollable Main Viewport -->
@@ -228,11 +205,6 @@
                   "The weak chase cheap dopamine. The Sovereign builds an empire."
                 </p>
               </div>
-              <div class="campaign-countdown-box">
-                <span class="cc-label">CAMPAIGN TIMELINE</span>
-                <span class="cc-dates neon-cyan">OCT 5, 2026 ➔ APR 1, 2027</span>
-                <div class="cc-badge"><span class="neon-gold font-mono" id="menu-discipline-badge">178 DAYS</span> OF DISCIPLINE</div>
-              </div>
             </div>
 
             <!-- Mandatory Daily Check-In Warning Card -->
@@ -246,16 +218,12 @@
             <div class="aura-freeze-console">
               <div class="afc-status-col">
                 <div class="campaign-status-pill" id="menu-campaign-status-pill">
-                  <span class="status-indicator">●</span> PRE-DEPLOYMENT: STARTS OCT 5, 2026
+                  <span class="status-indicator neon-green">●</span> CAMPAIGN OPERATIONAL // DAY 1
                 </div>
                 <div class="afc-metrics">
-                  <span class="afc-m-item">Timeline: <strong class="neon-cyan" id="cal-window-display">Oct 5 ➔ <span id="cal-target-end-date">Apr 1, 2027</span></strong></span>
-                  <span class="afc-m-sep">•</span>
-                  <span class="afc-m-item">Discipline: <strong class="neon-gold" id="cal-discipline-count">178 Days</strong></span>
+                  <span class="afc-m-item">Status: <strong class="neon-cyan">LIVE</strong></span>
                   <span class="afc-m-sep">•</span>
                   <span class="afc-m-item">Frozen: <strong class="neon-purple" id="cal-frozen-count">0 Days</strong></span>
-                  <span class="afc-m-sep">•</span>
-                  <span class="afc-m-item">Extension: <strong class="neon-green" id="cal-extension-count">+0 Days</strong></span>
                 </div>
               </div>
               <div class="afc-action-col">
@@ -391,12 +359,12 @@
               </div>
 
               <div class="radar-stats-chips">
-                <span class="r-chip">PUR: <strong id="r-stat-pur" class="neon-cyan">10</strong></span>
-                <span class="r-chip">VIT: <strong id="r-stat-vit" class="neon-green">10</strong></span>
-                <span class="r-chip">STR: <strong id="r-stat-str" class="neon-amber">10</strong></span>
-                <span class="r-chip">CHA: <strong id="r-stat-cha" class="neon-cyan">10</strong></span>
-                <span class="r-chip">AURA: <strong id="r-stat-aura" class="neon-purple">10</strong></span>
-                <span class="r-chip">INT: <strong id="r-stat-int" class="neon-gold">10</strong></span>
+                <span class="r-chip">PUR: <strong id="r-stat-pur" class="neon-cyan">0</strong></span>
+                <span class="r-chip">VIT: <strong id="r-stat-vit" class="neon-green">0</strong></span>
+                <span class="r-chip">STR: <strong id="r-stat-str" class="neon-amber">0</strong></span>
+                <span class="r-chip">CHA: <strong id="r-stat-cha" class="neon-cyan">0</strong></span>
+                <span class="r-chip">AURA: <strong id="r-stat-aura" class="neon-purple">0</strong></span>
+                <span class="r-chip">INT: <strong id="r-stat-int" class="neon-gold">0</strong></span>
               </div>
             </div>
 
@@ -802,11 +770,11 @@
             </div>
           </div>
 
-          <!-- Section 3: GitHub-Style 26-Week Campaign Activity & Discipline Heatmap -->
+          <!-- Section 3: 26-Week Activity & Discipline Heatmap -->
           <div class="glass-panel heatmap-card">
             <div class="panel-header">
-              <span class="panel-tag">CAMPAIGN DISCIPLINE HEATMAP // OCT 5, 2026 ➔ APR 1, 2027</span>
-              <span class="panel-id">178-DAY PROTOCOL CONSISTENCY</span>
+              <span class="panel-tag">DISCIPLINE HEATMAP // 26-WEEK PROTOCOL</span>
+              <span class="panel-id">PROTOCOL CONSISTENCY</span>
             </div>
             
             <div class="heatmap-scroll-wrap">
@@ -879,7 +847,7 @@
                     <span class="cdr-sub-tag">OVERALL PROTOCOL REPORT</span>
                     <h3 class="cdr-date-title" id="cdr-date-title">Sunday, October 4, 2026</h3>
                   </div>
-                  <span class="badge-amber" id="cdr-status-badge">PRE-CAMPAIGN // STARTS OCT 5</span>
+                  <span class="badge-cyan" id="cdr-status-badge">SYSTEM ACTIVE</span>
                 </div>
 
                 <!-- Metrics Summary Grid for Selected Date -->

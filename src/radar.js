@@ -23,12 +23,12 @@ export function renderRadarChart(canvasId, stats) {
   const centerY = height / 2 + 5;
   const radius = Math.min(centerX, centerY) - 48;
   const attributes = [
-    { key: 'pur', label: 'PURITY', val: stats.pur || 10 },
-    { key: 'vit', label: 'HEALTH', val: stats.vit || 10 },
-    { key: 'str', label: 'STRENGTH', val: stats.str || 10 },
-    { key: 'cha', label: 'GROOMING', val: stats.cha || 10 },
-    { key: 'aura', label: 'MINDSET', val: stats.aura || 10 },
-    { key: 'int', label: 'CAREER', val: stats.int || 10 }
+    { key: 'pur', label: 'PURITY', val: stats.pur ?? 0 },
+    { key: 'vit', label: 'HEALTH', val: stats.vit ?? 0 },
+    { key: 'str', label: 'STRENGTH', val: stats.str ?? 0 },
+    { key: 'cha', label: 'GROOMING', val: stats.cha ?? 0 },
+    { key: 'aura', label: 'MINDSET', val: stats.aura ?? 0 },
+    { key: 'int', label: 'CAREER', val: stats.int ?? 0 }
   ];
 
   const totalPoints = attributes.length;
@@ -87,7 +87,7 @@ export function renderRadarChart(canvasId, stats) {
   for (let i = 0; i < totalPoints; i++) {
     const angle = i * angleStep - Math.PI / 2;
     const ratio = Math.min(attributes[i].val / scaleMax, 1);
-    const pointRadius = Math.max(ratio * radius, 12);
+    const pointRadius = ratio > 0 ? Math.max(ratio * radius, 8) : 0;
     const px = centerX + Math.cos(angle) * pointRadius;
     const py = centerY + Math.sin(angle) * pointRadius;
     dataCoords.push({ x: px, y: py });

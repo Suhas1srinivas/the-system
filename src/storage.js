@@ -3,11 +3,12 @@
  * Grounded, practical real-life gamification with Dear Diary support
  */
 
-const STORAGE_KEY = 'the_system_monarch_state_v2';
+const STORAGE_KEY = 'the_system_monarch_state_v3';
 import { queueCloudSync } from './sync.js';
 
 export function getDefaultState() {
   const now = Date.now();
+  const launchStart = new Date('2026-11-01T00:00:00').getTime();
 
   return {
     player: {
@@ -26,30 +27,29 @@ export function getDefaultState() {
       maxMp: 100
     },
     stats: {
-      pur: 10,
-      vit: 10,
-      str: 10,
-      cha: 10,
-      aura: 10,
-      int: 10
+      pur: 0,
+      vit: 0,
+      str: 0,
+      cha: 0,
+      aura: 0,
+      int: 0
     },
     settings: {
       cigsPerDay: 2,
       costPerCig: 25
     },
-    campaignStartDate: '2026-10-05',
-    campaignBaseEndDate: '2027-04-01',
+    campaignStartDate: '2026-11-01',
     extendedDaysCount: 0,
     frozenDates: {}, // Format: { 'YYYY-MM-DD': { type: 'travel'|'sick', reason: string, timestamp: number } }
     dailyHistory: {},
     diaryEntries: [],
     pillarPurity: {
       streakDays: 0,
-      lastRelapseTimestamp: new Date('2026-10-05T00:00:00').getTime(),
+      lastRelapseTimestamp: launchStart,
       breachHistory: []
     },
     pillarEngine: {
-      smokeFreeStartTimestamp: new Date('2026-10-05T00:00:00').getTime(),
+      smokeFreeStartTimestamp: launchStart,
       cigsAvoidedCount: 0,
       moneySaved: 0,
       cravingSurfedCount: 0
@@ -107,7 +107,7 @@ export function getDefaultState() {
       ],
       gratitudeEntries: ["", "", ""],
       gratitudeSealedDate: null,
-      dailyMoodScore: 8,
+      dailyMoodScore: 0,
       dailyMoodDate: null
     },
     pillarApex: {
@@ -144,6 +144,11 @@ export function reconcileState(parsed) {
   const defaultState = getDefaultState();
   if (!parsed || typeof parsed !== 'object') return defaultState;
 
+  // If parsed state is from legacy pre-Nov 1 sessions, wipe and return pristine fresh state
+  if (parsed.campaignStartDate && parsed.campaignStartDate !== '2026-11-01') {
+    return defaultState;
+  }
+
   // 1. RECONCILE PLAYER OBJECT (prevents string overwrite from dummy cloud sync)
   if (!parsed.player || typeof parsed.player !== 'object') {
     const pName = (typeof parsed.player === 'string' && parsed.player.trim()) ? parsed.player.trim() : 'Suhas S';
@@ -169,7 +174,7 @@ export function reconcileState(parsed) {
     parsed.stats = { ...defaultState.stats, ...parsed.stats };
     ['pur', 'vit', 'str', 'cha', 'aura', 'int'].forEach(k => {
       if (typeof parsed.stats[k] !== 'number' || isNaN(parsed.stats[k])) {
-        parsed.stats[k] = 10;
+        parsed.stats[k] = 0;
       }
     });
   }
@@ -284,13 +289,13 @@ export function reconcileState(parsed) {
     parsed.lastResetDate = today;
   }
 
-  // Anchor smoke-free and purity timestamps to campaign launch (Oct 5, 2026, 00:00:00)
-  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  // Anchor smoke-free and purity timestamps to campaign start (Nov 1, 2026, 00:00:00)
+  const campaignStart = new Date('2026-11-01T00:00:00').getTime();
   if (Date.now() >= campaignStart) {
-    if (parsed.pillarEngine && (!parsed.pillarEngine.smokeFreeStartTimestamp || parsed.pillarEngine.smokeFreeStartTimestamp > campaignStart)) {
+    if (parsed.pillarEngine && (!parsed.pillarEngine.smokeFreeStartTimestamp || parsed.pillarEngine.smokeFreeStartTimestamp < campaignStart)) {
       parsed.pillarEngine.smokeFreeStartTimestamp = campaignStart;
     }
-    if (parsed.pillarPurity && (!parsed.pillarPurity.lastRelapseTimestamp || (parsed.pillarPurity.lastRelapseTimestamp > campaignStart && (!parsed.pillarPurity.breachHistory || parsed.pillarPurity.breachHistory.length === 0)))) {
+    if (parsed.pillarPurity && (!parsed.pillarPurity.lastRelapseTimestamp || parsed.pillarPurity.lastRelapseTimestamp < campaignStart)) {
       parsed.pillarPurity.lastRelapseTimestamp = campaignStart;
     }
   }
@@ -300,9 +305,17 @@ export function reconcileState(parsed) {
 
 export function loadState() {
   try {
+    // Purge legacy storage keys so user gets a pristine fresh start from today
+    localStorage.removeItem('the_system_monarch_state_v2');
+    localStorage.removeItem('the_system_monarch_state');
+    localStorage.removeItem('the_system_monarch_local_state_v1');
+
     const raw = localStorage.getItem(STORAGE_KEY);
     const defaultState = getDefaultState();
-    if (!raw) return defaultState;
+    if (!raw) {
+      saveState(defaultState);
+      return defaultState;
+    }
     let parsed = JSON.parse(raw);
     const finalState = reconcileState(parsed);
     saveState(finalState);
@@ -311,6 +324,18 @@ export function loadState() {
     console.error('Failed to load state from localStorage:', e);
     return getDefaultState();
   }
+}
+
+export function resetAllDataToZero() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('the_system_monarch_state_v2');
+    localStorage.removeItem('the_system_monarch_state');
+    localStorage.removeItem('the_system_monarch_local_state_v1');
+  } catch (e) {}
+  const fresh = getDefaultState();
+  saveState(fresh);
+  return fresh;
 }
 
 export function saveState(state) {
@@ -349,7 +374,7 @@ export function getHistoricalTimeline(state, numDays = 7) {
     const dayName = dayNames[d.getDay()];
     const shortDate = `${monthNames[d.getMonth()]} ${d.getDate()}`;
     const isToday = (i === 0);
-    const campaignStart = new Date('2026-10-05T00:00:00');
+    const campaignStart = new Date('2026-11-01T00:00:00');
     const isBeforeLaunch = d < campaignStart;
 
     if (isToday) {

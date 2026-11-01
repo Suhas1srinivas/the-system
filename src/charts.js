@@ -2,7 +2,7 @@
  * LIFE OS // PROGRESS CHARTS & HISTORICAL ANALYTICS ENGINE
  * Renders multi-day historical trends, workout volume bars, protein tracking,
  * mood frequency curves, career sprint progress, and GitHub-style campaign heatmaps.
- * Zero-baseline architecture for official launch starting Oct 5, 2026.
+ * Zero-baseline architecture for official launch starting Nov 1, 2026.
  */
 
 // Helper to set up responsive canvas with High-DPI support
@@ -92,11 +92,11 @@ export function renderWeeklyTrendChart(canvasId, activityData) {
     ctx.fillStyle = '#94a3b8';
     ctx.font = '600 11px Rajdhani, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('CAMPAIGN LAUNCHES OCT 5 (12:00 AM) • 0 XP LOGGED', width / 2, paddingTop + chartHeight / 2 - 8);
+    ctx.fillText('CAMPAIGN ACTIVE • 0 XP LOGGED TODAY', width / 2, paddingTop + chartHeight / 2 - 8);
 
     ctx.fillStyle = '#64748b';
     ctx.font = '500 10px Outfit, sans-serif';
-    ctx.fillText('Protocol momentum curve starts recording tomorrow officially', width / 2, paddingTop + chartHeight / 2 + 10);
+    ctx.fillText('Complete daily quests and protocols to build momentum', width / 2, paddingTop + chartHeight / 2 + 10);
 
     // Draw day ticks along bottom
     points.forEach((pt) => {
@@ -342,7 +342,7 @@ export function renderProteinHistoryChart(canvasId, timeline) {
     ctx.fillStyle = '#64748b';
     ctx.font = '500 10px Outfit, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Target: 120g Daily Benchmark • Tracking Starts Oct 5', width / 2, paddingTop + chartHeight / 2);
+    ctx.fillText('Target: 120g Daily Benchmark • 0g Logged Today', width / 2, paddingTop + chartHeight / 2);
 
     points.forEach((pt) => {
       ctx.fillStyle = pt.isToday ? '#00f0ff' : '#94a3b8';
@@ -656,8 +656,8 @@ export function renderCampaignHeatmap(containerId, state) {
   const today = new Date();
   const todayStr = today.toDateString();
 
-  // Campaign spans 26 weeks from Oct 5, 2026 to Apr 1, 2027
-  const startDate = new Date('2026-10-05T00:00:00');
+  // 26-week activity heatmap anchored to launch date (Nov 1, 2026)
+  const startDate = new Date('2026-11-01T00:00:00');
 
   // Build grid of 26 weeks x 7 days
   const weeks = 26;
@@ -703,10 +703,10 @@ export function renderCampaignHeatmap(containerId, state) {
         title += ` • Completed: ${count}/5 Protocols`;
       } else if (isPast) {
         level = 0;
-        title += ' • Pre-Campaign Baseline';
+        title += ' • Prior Baseline (0 XP)';
       } else {
         level = 'future';
-        title += ' • Scheduled Campaign Day';
+        title += ' • Scheduled Protocol Day';
       }
 
       const activeTodayClass = isCurrentDay ? 'today-cell pulse-cyan-border' : '';

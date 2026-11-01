@@ -226,7 +226,7 @@ function renderDashboardAnalytics() {
 
   const smokeEl = document.getElementById('dash-kpi-smoke');
   const smokeSub = document.getElementById('dash-kpi-smoke-sub');
-  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  const campaignStart = new Date('2026-11-01T00:00:00').getTime();
   const smokeStart = state.pillarEngine?.smokeFreeStartTimestamp || campaignStart;
   const diffMs = Math.max(Date.now() - smokeStart, 0);
   const diffHours = diffMs / 3600000;
@@ -260,12 +260,12 @@ function renderDashboardAnalytics() {
   // 2. Flagship Chart 1: 6-Attribute System Radar Chart
   if (state.stats) {
     renderRadarChart('stats-radar-canvas', state.stats);
-    const rPur = document.getElementById('r-stat-pur'); if (rPur) rPur.innerText = state.stats.pur || 10;
-    const rVit = document.getElementById('r-stat-vit'); if (rVit) rVit.innerText = state.stats.vit || 10;
-    const rStr = document.getElementById('r-stat-str'); if (rStr) rStr.innerText = state.stats.str || 10;
-    const rCha = document.getElementById('r-stat-cha'); if (rCha) rCha.innerText = state.stats.cha || 10;
-    const rAura = document.getElementById('r-stat-aura'); if (rAura) rAura.innerText = state.stats.aura || 10;
-    const rInt = document.getElementById('r-stat-int'); if (rInt) rInt.innerText = state.stats.int || 10;
+    const rPur = document.getElementById('r-stat-pur'); if (rPur) rPur.innerText = state.stats.pur ?? 0;
+    const rVit = document.getElementById('r-stat-vit'); if (rVit) rVit.innerText = state.stats.vit ?? 0;
+    const rStr = document.getElementById('r-stat-str'); if (rStr) rStr.innerText = state.stats.str ?? 0;
+    const rCha = document.getElementById('r-stat-cha'); if (rCha) rCha.innerText = state.stats.cha ?? 0;
+    const rAura = document.getElementById('r-stat-aura'); if (rAura) rAura.innerText = state.stats.aura ?? 0;
+    const rInt = document.getElementById('r-stat-int'); if (rInt) rInt.innerText = state.stats.int ?? 0;
   }
 
   // 3. Flagship Chart 2: 7-Day Consistency & Momentum Trend
@@ -736,7 +736,7 @@ function renderCalendarDayReport(targetDate) {
 
   const today = new Date();
   const isToday = targetDate.toDateString() === today.toDateString();
-  const campaignStart = new Date('2026-10-05T00:00:00');
+  const campaignStart = new Date('2026-11-01T00:00:00');
   const isBeforeLaunch = targetDate < campaignStart && !isToday;
   const targetDateKey = targetDate.toDateString();
 
@@ -760,13 +760,13 @@ function renderCalendarDayReport(targetDate) {
     }
   } else if (isToday) {
     if (statusBadge) {
-      statusBadge.className = targetDate < campaignStart ? 'badge-amber' : 'badge-cyan';
-      statusBadge.innerText = targetDate < campaignStart ? 'PRE-CAMPAIGN // STARTS OCT 5' : 'TODAY (LIVE TRACKER)';
+      statusBadge.className = 'badge-cyan';
+      statusBadge.innerText = 'TODAY (LIVE TRACKER)';
     }
   } else if (isBeforeLaunch) {
     if (statusBadge) {
       statusBadge.className = 'badge-slate';
-      statusBadge.innerText = 'PRE-CAMPAIGN BASELINE';
+      statusBadge.innerText = 'BASELINE (0 XP)';
     }
   } else if (rec) {
     if (statusBadge) {
@@ -1495,7 +1495,7 @@ function updatePurityStreakDisplay() {
   const hoursEl = document.getElementById('purity-streak-hours');
   if (!daysEl || !hoursEl) return;
 
-  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  const campaignStart = new Date('2026-11-01T00:00:00').getTime();
   const start = state.pillarPurity.lastRelapseTimestamp || campaignStart;
   const diffMs = Math.max(Date.now() - start, 0);
   const totalHours = Math.floor(diffMs / 3600000);
@@ -1706,7 +1706,7 @@ function updateSmokeRecoveryMeters() {
   const timerEl = document.getElementById('smoke-free-counter');
   if (!timerEl) return;
 
-  const campaignStart = new Date('2026-10-05T00:00:00').getTime();
+  const campaignStart = new Date('2026-11-01T00:00:00').getTime();
   const start = state.pillarEngine.smokeFreeStartTimestamp || campaignStart;
   const diffMs = Math.max(Date.now() - start, 0);
   const totalSecs = Math.floor(diffMs / 1000);
@@ -2849,12 +2849,6 @@ function getLocalDateString(d = new Date()) {
   return `${y}-${m}-${day}`;
 }
 
-function calculateTargetEndDate() {
-  const baseEnd = new Date('2027-04-01T00:00:00');
-  const extensions = state.extendedDaysCount || 0;
-  baseEnd.setDate(baseEnd.getDate() + extensions);
-  return baseEnd;
-}
 
 export function isSystemInStasisToday() {
   const todayStr = getLocalDateString();
@@ -2865,40 +2859,14 @@ function updateFreezeStatusAndBanner() {
   const banner = document.getElementById('global-stasis-banner');
   const reasonEl = document.getElementById('stasis-banner-reason');
   const menuStatusPill = document.getElementById('menu-campaign-status-pill');
-  const targetEndEl = document.getElementById('cal-target-end-date');
   const frozenCountEl = document.getElementById('cal-frozen-count');
-  const extensionCountEl = document.getElementById('cal-extension-count');
-  const windowDisplayEl = document.getElementById('cal-window-display');
   const freezeBtn = document.getElementById('btn-toggle-freeze');
 
   const todayStr = getLocalDateString();
   const isTodayFrozen = isSystemInStasisToday();
   const totalFrozen = Object.keys(state.frozenDates || {}).length;
 
-  const effectiveEnd = calculateTargetEndDate();
-  const effectiveEndStr = effectiveEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  if (targetEndEl) targetEndEl.innerText = effectiveEndStr;
   if (frozenCountEl) frozenCountEl.innerText = `${totalFrozen} Day${totalFrozen === 1 ? '' : 's'}`;
-  if (extensionCountEl) extensionCountEl.innerText = `+${state.extendedDaysCount || 0} Day${state.extendedDaysCount === 1 ? '' : 's'}`;
-  if (windowDisplayEl) {
-    windowDisplayEl.innerHTML = `Oct 5, 2026 ➔ <span id="cal-target-end-date" class="neon-cyan font-mono">${effectiveEndStr}</span>`;
-  }
-
-  // Update top bar timeline box & menu indicators
-  const hudEnd = document.getElementById('hud-timeline-end');
-  if (hudEnd) hudEnd.innerText = effectiveEndStr;
-  const hudDiscipline = document.getElementById('hud-discipline-days');
-  if (hudDiscipline) hudDiscipline.innerText = `${178 + (state.extendedDaysCount || 0)} Days`;
-  const hudFrozen = document.getElementById('hud-frozen-days');
-  if (hudFrozen) hudFrozen.innerText = `${totalFrozen} Day${totalFrozen === 1 ? '' : 's'}`;
-  const hudExt = document.getElementById('hud-extension-days');
-  if (hudExt) hudExt.innerText = `+${state.extendedDaysCount || 0} Day${state.extendedDaysCount === 1 ? '' : 's'}`;
-
-  const calDiscipline = document.getElementById('cal-discipline-count');
-  if (calDiscipline) calDiscipline.innerText = `${178 + (state.extendedDaysCount || 0)} Days`;
-  const menuDiscipline = document.getElementById('menu-discipline-badge');
-  if (menuDiscipline) menuDiscipline.innerText = `${178 + (state.extendedDaysCount || 0)} DAYS`;
 
   // Toggle body stasis class so nothing down below can be operated!
   document.body.classList.toggle('system-stasis-active', isTodayFrozen);
@@ -2929,13 +2897,8 @@ function updateFreezeStatusAndBanner() {
       freezeBtn.title = 'Freeze Today (Stasis Mode)';
     }
     if (menuStatusPill) {
-      if (todayStr < state.campaignStartDate) {
-        menuStatusPill.innerHTML = '<span class="status-indicator">●</span> PRE-DEPLOYMENT: STARTS OCT 5, 2026';
-        menuStatusPill.className = 'campaign-status-pill';
-      } else {
-        menuStatusPill.innerHTML = '<span class="status-indicator neon-green">●</span> CAMPAIGN OPERATIONAL';
-        menuStatusPill.className = 'campaign-status-pill';
-      }
+      menuStatusPill.innerHTML = '<span class="status-indicator neon-green">●</span> CAMPAIGN OPERATIONAL // DAY 1';
+      menuStatusPill.className = 'campaign-status-pill';
     }
   }
 }
